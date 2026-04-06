@@ -1,0 +1,15 @@
+{
+  "name": "20260405142628",
+  "version": "1.0.0",
+  "main": "test_foam_cannon.spec.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}

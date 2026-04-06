@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- SEO -->
+  <title>PA 壶喷芯估算台 — 一键计算泡沫壶推荐喷芯尺寸</title>
+  <meta name="description" content="输入洗车机参数或选择型号，一键计算 PA 泡沫壶推荐喷芯直径。支持 30+ 主流洗车机型号数据库，基于伯努利孔口流量模型精准匹配。" />
+  <meta name="keywords" content="PA泡沫壶,喷芯计算器,洗车机喷芯,foam cannon,nozzle calculator,洗车泡沫壶,PA壶,喷芯直径,洗车机配件" />
+  <meta name="author" content="PA Foam Nozzle Calc" />
+  <link rel="canonical" href="https://junyuchen.cn/foam-cannon-calculator" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="PA 壶喷芯估算台 — 一键计算泡沫壶推荐喷芯尺寸" />
+  <meta property="og:description" content="选洗车机型号或手动填参数，一键算出推荐喷芯大小。支持 30+ 主流机型，精准匹配最佳喷芯。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://junyuchen.cn/foam-cannon-calculator" />
+  <meta property="og:image" content="https://junyuchen.cn/og-image.png" />
+  <meta property="og:locale" content="zh_CN" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="PA 壶喷芯估算台" />
+  <meta name="twitter:description" content="选洗车机型号或手动填参数，一键算出推荐喷芯大小。" />
+
+  <!-- 主题色 -->
+  <meta name="theme-color" content="#07131a" />
+  <meta name="color-scheme" content="dark" />
+
+  <!-- Favicon: 内联 SVG，无需额外文件 -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2371f0ff'/%3E%3Cstop offset='100%25' stop-color='%2300a9c2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='%2307131a' stroke='url(%23g)' stroke-width='4'/%3E%3Ctext x='50' y='66' text-anchor='middle' font-size='48' font-family='system-ui' fill='url(%23g)'%3E⚡%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2307131a'/%3E%3Ctext x='90' y='120' text-anchor='middle' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E" />
+  <style>
+    @import url("https://fonts.loli.net/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@400;500;700;900&display=swap");
+
+    :root {
+      --bg: #07131a;
+      --panel: rgba(9, 26, 35, 0.72);
+      --panel-strong: rgba(11, 33, 43, 0.95);
+      --line: rgba(141, 236, 255, 0.18);
+      --text: #ecfbff;
+      --muted: #88aeb7;
+      --cyan: #71f0ff;
+      --cyan-deep: #00a9c2;
+      --lime: #ceff7b;
+      --amber: #ffd36b;
+      --danger: #ff8570;
+      --shadow: 0 28px 70px rgba(0, 0, 0, 0.38);
+      --radius: 26px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans SC", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(0, 186, 255, 0.28), transparent 24%),
+        radial-gradient(circle at 88% 16%, rgba(206, 255, 123, 0.18), transparent 18%),
+        radial-gradient(circle at 50% 100%, rgba(0, 169, 194, 0.25), transparent 34%),
+        linear-gradient(135deg, #03080c, #07131a 42%, #0a2029 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: radial-gradient(circle at center, black 55%, transparent 100%);
+      pointer-events: none;
+      opacity: 0.38;
+    }
+
+    .shell {
+      width: min(720px, calc(100% - 32px));
+      margin: 30px auto 48px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== 头部 ===== */
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .header .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      padding: 8px 14px;
+      border: 1px solid rgba(113, 240, 255, 0.24);
+      border-radius: 999px;
+      background: rgba(113, 240, 255, 0.08);
+    }
+
+    .header h1 {
+      margin: 16px 0 8px;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(48px, 10vw, 88px);
+      line-height: 0.95;
+      letter-spacing: 0.04em;
+    }
+
+    .header p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ===== 卡片面板通用 ===== */
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      display: block;
+      margin-bottom: 16px;
+      color: var(--cyan);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    /* ===== 输入区 ===== */
+    .input-group {
+      display: grid;
+      gap: 14px;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .label-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 16px;
+      outline: none;
+      font-size: 15px;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    select {
+      appearance: none;
+      cursor: pointer;
+    }
+
+    input:focus, select:focus {
+      border-color: rgba(113, 240, 255, 0.65);
+      background: rgba(113, 240, 255, 0.08);
+    }
+
+    .inline-status {
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ===== 模式切换标签 ===== */
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .mode-tab {
+      flex: 1;
+      padding: 12px 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .mode-tab:hover {
+      border-color: rgba(113,240,255,0.3);
+      color: var(--text);
+    }
+
+    .mode-tab.active {
+      background: rgba(113,240,255,0.12);
+      border-color: rgba(113,240,255,0.5);
+      color: var(--cyan);
+    }
+
+    .mode-panel { display: none; }
+    .mode-panel.active { display: block; }
+
+    /* ===== 按钮 ===== */
+    .actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn-primary {
+      border: none;
+      cursor: pointer;
+      border-radius: 16px;
+      padding: 16px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--cyan), #5cf0ff 45%, var(--lime));
+      color: #07131a;
+      box-shadow: 0 18px 40px rgba(113, 240, 255, 0.22);
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.06);
+    }
+
+    .btn-secondary {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+    }
+
+
+    /* ===== 结果区 ===== */
+    .result-area {
+      display: none;
+    }
+
+    .result-area.show {
+      display: block;
+    }
+
+    .result-hero {
+      text-align: center;
+      padding: 32px 20px;
+    }
+
+    .result-hero .label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .result-hero .nozzle-size {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(72px, 14vw, 120px);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, var(--cyan), var(--lime));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .result-hero .nozzle-unit {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(28px, 5vw, 42px);
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    .result-hero .range-hint {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .result-hero .range-hint strong {
+      color: var(--text);
+    }
+
+    /* 结果子卡片 */
+    .result-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .result-mini-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+    }
+
+    .result-mini-card .mini-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .result-mini-card .mini-value {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 32px;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    .result-mini-card .mini-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* 一致性徽章 */
+    .consistency-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      margin-top: 14px;
+    }
+
+    .consistency-badge.good {
+      background: rgba(206,255,123,0.12);
+      border-color: rgba(206,255,123,0.34);
+      color: var(--lime);
+    }
+
+    .consistency-badge.warn {
+      background: rgba(255,211,107,0.12);
+      border-color: rgba(255,211,107,0.26);
+      color: var(--amber);
+    }
+
+    .consistency-badge.danger {
+      background: rgba(255,133,112,0.12);
+      border-color: rgba(255,133,112,0.3);
+      color: var(--danger);
+    }
+
+    /* ===== 折叠详情 ===== */
+    .detail-section {
+      margin-top: 18px;
+    }
+
+    .detail-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .detail-toggle:hover {
+      border-color: rgba(113,240,255,0.4);
+    }
+
+    .detail-toggle .arrow {
+      transition: transform 0.3s ease;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .detail-toggle.open .arrow {
+      transform: rotate(180deg);
+    }
+
+    .detail-body {
+      display: none;
+      padding: 0;
+    }
+
+    .detail-body.open {
+      display: block;
+    }
+
+    .detail-body .card {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      margin-top: -1px;
+      border-top-color: rgba(255,255,255,0.06);
+    }
+
+    .detail-toggle.open {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    /* ===== 详情内部组件 ===== */
+    .sub-title {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--cyan);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .glass-box {
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .msg-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .msg-card {
+      padding: 12px 14px;
+      border-radius: 14px;
+      line-height: 1.7;
+      font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .msg-card.good { border-color: rgba(206,255,123,0.2); }
+    .msg-card.warn { border-color: rgba(255,211,107,0.2); }
+    .msg-card.danger { border-color: rgba(255,133,112,0.2); }
+
+    /* 标准喷芯推荐列表 */
+    .candidate {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .candidate-main {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 30px;
+      letter-spacing: 0.04em;
+    }
+
+    .candidate-copy strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 13px;
+    }
+
+    .candidate-copy p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pill.good { background: rgba(206,255,123,0.12); color: var(--lime); }
+    .pill.warn { background: rgba(255,211,107,0.12); color: var(--amber); }
+    .pill.danger { background: rgba(255,133,112,0.12); color: var(--danger); }
+
+    /* 区间条 */
+    .range-bar {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .range-rail {
+      position: relative;
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .range-fill {
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 50%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--cyan), var(--lime));
+      box-shadow: 0 0 20px rgba(113,240,255,0.28);
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ===== 功率一览表 ===== */
+    .catalog-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 18px;
+    }
+
+    .catalog-toggle:hover {
+      border-color: rgba(113,240,255,0.4);
+    }
+
+    .catalog-toggle .arrow {
+      transition: transform 0.3s ease;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .catalog-toggle.open .arrow {
+      transform: rotate(180deg);
+    }
+
+    .catalog-toggle.open {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .catalog-body {
+      display: none;
+    }
+
+    .catalog-body.open {
+      display: block;
+    }
+
+    .catalog-body .card {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      margin-top: -1px;
+      border-top-color: rgba(255,255,255,0.06);
+    }
+
+    .catalog-brand-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .catalog-brand-tab {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .catalog-brand-tab:hover {
+      border-color: rgba(113,240,255,0.4);
+      color: var(--text);
+    }
+
+    .catalog-brand-tab.active {
+      background: rgba(113,240,255,0.12);
+      border-color: rgba(113,240,255,0.5);
+      color: var(--cyan);
+    }
+
+    .catalog-brand-group { margin-bottom: 14px; }
+    .catalog-brand-group:last-child { margin-bottom: 0; }
+
+    .catalog-brand-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .catalog-brand-name::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(113,240,255,0.15);
+    }
+
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 8px;
+    }
+
+    .catalog-card {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .catalog-card:hover {
+      border-color: rgba(113,240,255,0.3);
+      background: rgba(113,240,255,0.06);
+    }
+
+    .catalog-card-model {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .catalog-card-specs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .spec-chip {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .spec-chip.power {
+      background: rgba(255,211,107,0.1);
+      color: var(--amber);
+    }
+
+    .catalog-card-tier {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .catalog-card-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(113,240,255,0.1);
+      border: 1px solid rgba(113,240,255,0.2);
+      color: var(--cyan);
+      font-size: 14px;
+      cursor: pointer;
+      flex: none;
+      transition: all 0.2s ease;
+    }
+
+    .catalog-card:hover .catalog-card-action {
+      background: rgba(113,240,255,0.2);
+      border-color: rgba(113,240,255,0.5);
+    }
+
+    /* ===== 反馈入口 ===== */
+    .feedback-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      border: 1px dashed rgba(113,240,255,0.25);
+      border-radius: var(--radius);
+      background: rgba(113,240,255,0.04);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 18px;
+    }
+
+    .feedback-toggle:hover {
+      border-color: rgba(113,240,255,0.5);
+      color: var(--text);
+      background: rgba(113,240,255,0.08);
+    }
+
+    .feedback-body {
+      display: none;
+      margin-top: -1px;
+    }
+
+    .feedback-body.open {
+      display: block;
+    }
+
+    .feedback-body .card {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .feedback-toggle.open {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-style: solid;
+      border-color: var(--line);
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .feedback-type-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .feedback-type-tab {
+      flex: 1;
+      padding: 10px 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .feedback-type-tab:hover {
+      border-color: rgba(113,240,255,0.3);
+      color: var(--text);
+    }
+
+    .feedback-type-tab.active {
+      background: rgba(113,240,255,0.12);
+      border-color: rgba(113,240,255,0.5);
+      color: var(--cyan);
+    }
+
+    .feedback-panel { display: none; }
+    .feedback-panel.active { display: block; }
+
+    .feedback-required::after {
+      content: " *";
+      color: var(--danger);
+    }
+
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 16px;
+      outline: none;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .feedback-textarea:focus {
+      border-color: rgba(113,240,255,0.65);
+      background: rgba(113,240,255,0.08);
+    }
+
+    .feedback-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .feedback-actions button {
+      flex: 1;
+    }
+
+    .btn-feedback {
+      border: none;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--cyan), #5cf0ff 45%, var(--lime));
+      color: #07131a;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .btn-feedback:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+    }
+
+    .btn-feedback:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      filter: none;
+    }
+
+    .btn-copy-feedback {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-copy-feedback:hover {
+      transform: translateY(-1px);
+      border-color: rgba(113,240,255,0.3);
+    }
+
+    .feedback-success {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: var(--lime);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .feedback-success.show {
+      display: block;
+    }
+
+    /* ===== 页脚 ===== */
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+      text-align: center;
+      padding: 12px 18px 0;
+    }
+
+    /* ===== 分割线 ===== */
+    .sep { margin: 16px 0; }
+
+    /* ===== 全局触摸优化 ===== */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      body { padding-bottom: env(safe-area-inset-bottom); }
+    }
+
+    html { scroll-behavior: smooth; }
+    body { overscroll-behavior-y: contain; }
+
+    button, .catalog-card, .mode-tab, .feedback-type-tab, .catalog-brand-tab {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ===== 响应式：中屏 ≤768px ===== */
+    @media (max-width: 768px) {
+      .result-cards { grid-template-columns: repeat(2, 1fr); }
+      .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    }
+
+    /* ===== 响应式：手机 ≤600px ===== */
+    @media (max-width: 600px) {
+      .shell {
+        width: calc(100% - 24px);
+        margin: 12px auto 100px; /* 底部留出固定按钮空间 */
+        padding-left: env(safe-area-inset-left, 0px);
+        padding-right: env(safe-area-inset-right, 0px);
+      }
+
+      .card {
+        padding: 18px 16px;
+        border-radius: 20px;
+      }
+
+      .header { margin-bottom: 20px; }
+      .header h1 { font-size: 56px; }
+      .header p { font-size: 13px; }
+
+      /* 输入布局 */
+      .input-row { grid-template-columns: 1fr; }
+      .input-group { gap: 12px; }
+
+      /* 输入控件增大触摸区域 */
+      input, select {
+        padding: 16px;
+        font-size: 16px; /* 防止 iOS 自动缩放 */
+        border-radius: 14px;
+        min-height: 52px;
+      }
+
+      /* 模式切换标签 */
+      .mode-tabs { gap: 6px; }
+      .mode-tab {
+        padding: 14px 8px;
+        font-size: 13px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* 结果区 */
+      .result-hero { padding: 24px 16px; }
+      .result-hero .nozzle-size { font-size: 80px; }
+      .result-cards { grid-template-columns: 1fr; gap: 10px; }
+      .result-mini-card { padding: 14px; }
+      .result-mini-card .mini-value { font-size: 28px; }
+
+      /* 详情布局 */
+      .two-col { grid-template-columns: 1fr; }
+      .candidate {
+        grid-template-columns: 1fr;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px;
+      }
+
+      /* 折叠面板触摸优化 */
+      .detail-toggle, .catalog-toggle {
+        border-radius: 20px;
+        padding: 16px;
+        min-height: 52px;
+        font-size: 14px;
+      }
+
+      .detail-toggle.open, .catalog-toggle.open, .feedback-toggle.open {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      /* 目录 */
+      .catalog-grid { grid-template-columns: 1fr; }
+      .catalog-card {
+        padding: 14px 16px;
+        min-height: 56px;
+      }
+      .catalog-card-action {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      .catalog-brand-tab {
+        padding: 8px 14px;
+        font-size: 12px;
+        min-height: 36px;
+      }
+
+      /* 反馈面板 */
+      .feedback-toggle {
+        padding: 16px;
+        min-height: 52px;
+        font-size: 13px;
+      }
+      .feedback-type-tabs { gap: 6px; }
+      .feedback-type-tab {
+        padding: 12px 8px;
+        font-size: 12px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .feedback-textarea {
+        min-height: 120px;
+        font-size: 16px; /* 防止 iOS 缩放 */
+        padding: 16px;
+      }
+      .feedback-actions {
+        flex-direction: column;
+      }
+      .feedback-actions button {
+        min-height: 48px;
+      }
+
+      /* 按钮触摸尺寸 */
+      .btn-primary, .btn-secondary, .btn-feedback, .btn-copy-feedback {
+        min-height: 52px;
+        border-radius: 14px;
+      }
+
+      /* 按钮按下反馈 */
+      .btn-primary:active {
+        transform: scale(0.97);
+        filter: brightness(0.94);
+      }
+      .btn-secondary:active,
+      .btn-feedback:active,
+      .btn-copy-feedback:active {
+        transform: scale(0.97);
+      }
+
+      /* 分割线间距 */
+      .sep { margin: 12px 0; }
+
+      /* 页脚 */
+      .footer-note { font-size: 11px; padding-bottom: 8px; }
+    }
+
+    /* ===== 响应式：超小屏 ≤380px ===== */
+    @media (max-width: 380px) {
+      .shell { width: calc(100% - 16px); }
+      .card { padding: 14px 12px; }
+      .header h1 { font-size: 44px; }
+      .header .eyebrow { font-size: 10px; padding: 6px 10px; }
+      .result-hero .nozzle-size { font-size: 64px; }
+      .result-mini-card .mini-value { font-size: 24px; }
+      .mode-tab, .feedback-type-tab { font-size: 11px; }
+      .catalog-card-model { font-size: 12px; }
+    }
+
+    /* ===== 手机端固定计算按钮 ===== */
+    @media (max-width: 600px) {
+      .mobile-sticky-calc {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 12px 16px;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        background: rgba(7, 19, 26, 0.92);
+        backdrop-filter: blur(16px);
+        border-top: 1px solid var(--line);
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+        display: flex;
+        gap: 10px;
+      }
+      .mobile-sticky-calc .btn-primary {
+        flex: 1;
+        margin: 0;
+      }
+      /* 隐藏原始按钮区（仅手机端） */
+      .actions.original-actions {
+        display: none;
+      }
+    }
+    @media (min-width: 601px) {
+      .mobile-sticky-calc { display: none; }
+    }
+  </style>
+
+  <!-- 结构化数据 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PA 壶喷芯估算台",
+    "description": "输入洗车机参数或选择型号，一键计算 PA 泡沫壶推荐喷芯直径",
+    "url": "https://junyuchen.cn/foam-cannon-calculator",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "CNY"
+    },
+    "inLanguage": "zh-CN"
+  }
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <!-- ===== 头部 ===== -->
+    <div class="header">
+      <div class="eyebrow">PA FOAM · NOZZLE CALC</div>
+      <h1>PA 壶喷芯估算台</h1>
+      <p>选洗车机型号或手动填参数，一键算出推荐喷芯大小。</p>
+    </div>
+
+    <!-- ===== 输入区 ===== -->
+    <div class="card" id="inputCard">
+      <span class="card-title">选择你的洗车机</span>
+
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="brand">按品牌选型号</button>
+        <button class="mode-tab" data-mode="custom">手动输入参数</button>
+      </div>
+
+      <!-- 品牌选型号模式 -->
+      <div class="mode-panel active" id="panelBrand">
+        <div class="input-group">
+          <div class="input-row">
+            <label>
+              <span>品牌</span>
+              <select id="brandFilterSelect">
+                <option value="all">全部品牌</option>
+              </select>
+            </label>
+            <label>
+              <span>型号</span>
+              <input id="modelSearchInput" type="text" list="washerModelList" value="" placeholder="K5 / 雪豹 P5 / BM1522" />
+              <datalist id="washerModelList"></datalist>
+            </label>
+          </div>
+          <div id="modelStatus" class="inline-status">内置 10 个品牌、30 个常见机型，选好型号自动带入参数。</div>
+        </div>
+
+
+      </div>
+
+      <!-- 手动输入模式 -->
+      <div class="mode-panel" id="panelCustom">
+        <div class="input-group">
+          <label>
+            <div class="label-top">
+              <span>功率（W，可选）</span>
+              <span class="hint" id="powerFieldHint">留空则不做一致性校验</span>
+            </div>
+            <input id="powerInput" type="text" inputmode="numeric" value="" placeholder="例如 1500" />
+          </label>
+          <div class="input-row">
+            <label>
+              <div class="label-top">
+                <span>流量（L/min）</span>
+                <span class="hint">必填</span>
+              </div>
+              <input id="flowInput" type="text" inputmode="decimal" value="8" />
+            </label>
+            <label>
+              <div class="label-top">
+                <span>压力（bar）</span>
+                <span class="hint" id="pressureFieldHint">留空用功率估算</span>
+              </div>
+              <input id="pressureInput" type="text" inputmode="decimal" value="100" placeholder="例如 100" />
+            </label>
+          </div>
+          <div id="inputRuleHint" class="inline-status">流量 + 压力，可以直接算。</div>
+        </div>
+      </div>
+
+      <div class="actions original-actions">
+        <button class="btn-primary" id="calcBtn">⚡ 计算推荐喷芯</button>
+        <button class="btn-secondary" id="resetBtn">恢复默认</button>
+      </div>
+    </div>
+
+    <!-- ===== 不适配提示区 ===== -->
+    <div class="result-area" id="notRecommendedArea" style="display:none;">
+      <div class="card" style="border-color:rgba(255,133,112,0.35);">
+        <div style="text-align:center;padding:28px 20px;">
+          <div style="font-size:64px;margin-bottom:12px;">🚫</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,56px);line-height:1;color:var(--danger);margin-bottom:16px;">NOT RECOMMENDED</div>
+          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;" id="notRecTitle">该机器不建议搭配泡沫壶</div>
+          <div style="font-size:14px;color:var(--muted);line-height:1.8;max-width:480px;margin:0 auto;" id="notRecReason"></div>
+        </div>
+        <div style="margin-top:16px;" id="notRecDetails" class="msg-list"></div>
+        <div style="margin-top:20px;padding:16px;border-radius:18px;background:rgba(206,255,123,0.06);border:1px solid rgba(206,255,123,0.15);">
+          <span class="sub-title" style="color:var(--lime);">💡 替代方案</span>
+          <div class="msg-list" id="notRecAlternatives"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 结果区 ===== -->
+    <div class="result-area" id="resultArea">
+      <div class="card">
+        <div class="result-hero">
+          <div class="label">推荐喷芯</div>
+          <span class="nozzle-size" id="closestSize">1.30</span>
+          <span class="nozzle-unit">mm</span>
+          <div class="range-hint">
+            合理区间 <strong id="rangeMinText">1.21</strong> ~ <strong id="rangeMaxText">1.40</strong> mm，
+            标称推荐 <strong id="nominalText">1.30</strong> mm
+          </div>
+          <div class="consistency-badge good" id="consistencyBadge">工况自洽：问题不大</div>
+        </div>
+
+        <div class="result-cards">
+          <div class="result-mini-card">
+            <div class="mini-label">合理下限</div>
+            <div class="mini-value" id="diameterMin">1.21</div>
+            <div class="mini-desc">偏浓泡，更吃压力</div>
+          </div>
+          <div class="result-mini-card">
+            <div class="mini-label">标称推荐</div>
+            <div class="mini-value" id="diameterNominal">1.30</div>
+            <div class="mini-desc">先买它，通常最稳</div>
+          </div>
+          <div class="result-mini-card">
+            <div class="mini-label">合理上限</div>
+            <div class="mini-value" id="diameterMax">1.40</div>
+            <div class="mini-desc">过水大，泡更松</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 计算详情（折叠） ===== -->
+      <div class="detail-section">
+        <button class="detail-toggle" id="detailToggle">
+          <span>📊 计算详情</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="detail-body" id="detailBody">
+          <div class="card">
+            <!-- 区间条 -->
+            <div class="range-bar" style="margin-bottom:18px;">
+              <span class="sub-title">推荐区间刻度</span>
+              <div class="range-rail">
+                <div class="range-fill" id="rangeFill"></div>
+              </div>
+              <div class="range-labels">
+                <span>标准库：1.10 ~ 2.00 mm</span>
+                <span id="rangeText">当前推荐：1.21 ~ 1.40 mm</span>
+              </div>
+            </div>
+
+            <!-- 标准喷芯推荐 + 工况判断 -->
+            <div class="two-col" style="margin-bottom:16px;">
+              <div class="glass-box">
+                <span class="sub-title">标准喷芯推荐</span>
+                <div id="libraryList" class="msg-list"></div>
+              </div>
+              <div class="glass-box">
+                <span class="sub-title">工况判断</span>
+                <div id="adviceList" class="msg-list"></div>
+                <div style="height:12px;"></div>
+                <span class="sub-title">风险提醒</span>
+                <div id="warningList" class="msg-list"></div>
+              </div>
+            </div>
+
+            <!-- 已有喷芯调节 + 计算依据 -->
+            <div class="two-col" style="margin-bottom:16px;">
+              <div class="glass-box">
+                <span class="sub-title">已有喷芯怎么调</span>
+                <div class="input-group" style="margin-bottom:12px;">
+                  <div class="input-row">
+                    <label>
+                      <span style="font-size:12px;">当前喷芯（mm）</span>
+                      <input id="currentNozzleInput" type="text" inputmode="decimal" value="" placeholder="1.25" style="padding:10px 12px;font-size:14px;" />
+                    </label>
+                    <label>
+                      <span style="font-size:12px;">目标方向</span>
+                      <select id="foamGoalSelect" style="padding:10px 12px;font-size:14px;">
+                        <option value="denser">更浓</option>
+                        <option value="balanced" selected>更稳</option>
+                        <option value="looser">更轻松</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+                <div id="reverseList" class="msg-list"></div>
+              </div>
+              <div class="glass-box">
+                <span class="sub-title">计算依据</span>
+                <div id="summaryList" class="msg-list"></div>
+                <div style="height:12px;"></div>
+                <span class="sub-title">模型假设</span>
+                <div class="msg-list">
+                  <div class="msg-card">喷芯按薄壁孔口处理，Cd 取 0.68 ~ 0.82。</div>
+                  <div class="msg-card">可利用压差按整机工作压力的 80%~100% 估算。</div>
+                  <div class="msg-card">初选参考，不替代实测。泡沫还受进气孔、发泡网、药液和喷枪影响。</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 公式 -->
+            <div style="text-align:center;padding:12px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.06em;color:var(--amber);">Q = Cd × A × √(2ΔP / ρ)</div>
+              <div class="hint" style="margin-top:8px;">伯努利 + 孔口流量模型 · 基准 MJJC 3.0 甜点带 80~140 bar / 1.15~1.35 mm</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 功率一览表（折叠） ===== -->
+    <button class="catalog-toggle" id="catalogToggle">
+      <span>📋 功率一览表（<span id="catalogCountText">10 品牌 / 30 机型</span>）</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="catalog-body" id="catalogBody">
+      <div class="card">
+        <div class="hint" style="margin-bottom:12px;">点击「算」一键带入计算器</div>
+        <div class="catalog-brand-tabs" id="catalogBrandTabs"></div>
+        <div id="catalogContent"></div>
+      </div>
+    </div>
+
+    <p class="footer-note">
+      结论别迷信到小数点后两位：真车真壶真药水，最后还得实喷。这个小工具的价值，是帮你别在明显不合适的喷芯上浪费时间。
+    </p>
+
+    <!-- ===== 建议 & 勘误入口 ===== -->
+    <button class="feedback-toggle" id="feedbackToggle">
+      <span>📝 建议 &amp; 勘误</span>
+    </button>
+    <div class="feedback-body" id="feedbackBody">
+      <div class="card">
+        <div class="feedback-type-tabs">
+          <button class="feedback-type-tab active" data-fbtype="errata">🔧 纠错 / 新增机型</button>
+          <button class="feedback-type-tab" data-fbtype="suggestion">💡 应用建议</button>
+        </div>
+
+        <!-- 纠错 / 新增机型 面板 -->
+        <div class="feedback-panel active" id="fbPanelErrata">
+          <div class="input-group">
+            <div class="input-row">
+              <label>
+                <span class="feedback-required">品牌名称</span>
+                <input id="fbBrand" type="text" placeholder="例如 卡赫、博世" />
+              </label>
+              <label>
+                <span class="feedback-required">型号</span>
+                <input id="fbModel" type="text" placeholder="例如 K5 Premium" />
+              </label>
+            </div>
+            <div class="input-row">
+              <label>
+                <span class="feedback-required">功率（W）</span>
+                <input id="fbPower" type="text" inputmode="numeric" placeholder="例如 2100" />
+              </label>
+              <label>
+                <span class="feedback-required">流量（L/h）</span>
+                <input id="fbFlow" type="text" inputmode="decimal" placeholder="例如 500" />
+              </label>
+            </div>
+            <div class="input-row">
+              <label>
+                <span>压力（bar，选填）</span>
+                <input id="fbPressure" type="text" inputmode="decimal" placeholder="例如 145" />
+              </label>
+              <label>
+                <span>类型</span>
+                <select id="fbErrataType">
+                  <option value="correction">参数纠错</option>
+                  <option value="new_model">新增机型</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              <span>补充说明（选填）</span>
+              <textarea class="feedback-textarea" id="fbErrataNote" rows="3" placeholder="比如：官方实测流量与标注不符、该型号已停产换代等"></textarea>
+            </label>
+          </div>
+        </div>
+
+        <!-- 应用建议 面板 -->
+        <div class="feedback-panel" id="fbPanelSuggestion">
+          <div class="input-group">
+            <label>
+              <span class="feedback-required">你的建议</span>
+              <textarea class="feedback-textarea" id="fbSuggestionText" rows="5" placeholder="对这个工具有啥想法都可以说——功能、交互、计算逻辑、新需求……"></textarea>
+            </label>
+          </div>
+        </div>
+
+        <div class="feedback-actions">
+          <button class="btn-copy-feedback" id="fbCopyBtn">📋 复制到剪贴板</button>
+        </div>
+
+        <div class="feedback-success" id="fbSuccess">
+          ✅ 已复制到剪贴板！<br/>
+          <span style="color:var(--muted);font-size:12px;">请粘贴发送到相关群聊或反馈渠道，感谢你的贡献 🙏</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端固定底部计算按钮 -->
+  <div class="mobile-sticky-calc" id="mobileStickyCalc">
+    <button class="btn-primary" id="mobileCalcBtn">⚡ 计算推荐喷芯</button>
+  </div>
+
+  <script>
+    /* ===== 常量 ===== */
+    const BAR_TO_PA = 100000;
+    const WATER_DENSITY = 1000;
+    const PUMP_EFFICIENCY_RANGE = [0.55, 0.75];
+    const NOZZLE_PRESSURE_RATIO_RANGE = [0.8, 1.0];
+    const DISCHARGE_COEFFICIENT_RANGE = [0.68, 0.82];
+    const STANDARD_SIZES_MM = [1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.5, 1.6, 1.8, 2.0];
+    const MJJC_3_BASELINE = {
+      name: "MJJC 3.0",
+      pressureSweetSpotBar: [80, 140],
+      nozzleSweetSpotMm: [1.15, 1.35]
+    };
+    const REVERSE_GOALS = {
+      denser: { label: "更浓一点", hint: "优先往小一档走，先拿泡感，代价是更吃压力。" },
+      balanced: { label: "更稳更通用", hint: "优先贴近标称推荐，泡感和过水量相对均衡。" },
+      looser: { label: "更轻松更大过水", hint: "优先往大一档走，让机器更轻松，但泡会更松。" }
+    };
+
+    /* ===== 洗车机数据库 ===== */
+    const WASHER_MODELS = [
+      { id:"karcher-k2-classic", brand:"卡赫", model:"K2 Classic", tier:"入门家用", powerWatts:1400, flowRateLpm:6.0, pressureBar:110, aliases:["k2","k2classic","卡赫k2","卡赫k2classic"] },
+      { id:"karcher-k3-power-control", brand:"卡赫", model:"K3 Power Control", tier:"入门升级", powerWatts:1600, flowRateLpm:6.3, pressureBar:120, aliases:["k3","k3powercontrol","卡赫k3","卡赫k3powercontrol"] },
+      { id:"karcher-k4-power-control", brand:"卡赫", model:"K4 Power Control", tier:"均衡家用", powerWatts:1800, flowRateLpm:7.0, pressureBar:130, aliases:["k4","k4powercontrol","卡赫k4","卡赫k4powercontrol"] },
+      { id:"karcher-k5-power-control", brand:"卡赫", model:"K5 Power Control", tier:"家用甜点", powerWatts:2100, flowRateLpm:8.3, pressureBar:145, aliases:["k5","k5powercontrol","卡赫k5","卡赫k5powercontrol"] },
+      { id:"karcher-k7-premium-smart-control", brand:"卡赫", model:"K7 Premium Smart Control", tier:"大流量进阶", powerWatts:3000, flowRateLpm:10.0, pressureBar:180, aliases:["k7","k7premiumsmartcontrol","卡赫k7","卡赫k7smart"] },
+      { id:"karcher-hd-6-15-4m", brand:"卡赫", model:"HD 6/15-4M", tier:"专业冷水机", powerWatts:3400, flowRateLpm:10.0, pressureBar:150, aliases:["hd6154m","hd6/15-4m","卡赫hd6154m","卡赫hd6/15-4m"] },
+      { id:"bosch-easyaquatak-110", brand:"博世", model:"EasyAquatak 110", tier:"轻量便携", powerWatts:1300, flowRateLpm:5.5, pressureBar:110, aliases:["easyaquatak110","ea110","博世110","博世easyaquatak110"] },
+      { id:"bosch-universalaquatak-125", brand:"博世", model:"UniversalAquatak 125", tier:"入门家用", powerWatts:1500, flowRateLpm:5.8, pressureBar:125, aliases:["universalaquatak125","ua125","博世125","博世ua125"] },
+      { id:"bosch-universalaquatak-135", brand:"博世", model:"UniversalAquatak 135", tier:"均衡家用", powerWatts:1900, flowRateLpm:6.5, pressureBar:135, aliases:["universalaquatak135","ua135","博世135","博世ua135"] },
+      { id:"bosch-advancedaquatak-140", brand:"博世", model:"AdvancedAquatak 140", tier:"进阶家用", powerWatts:2100, flowRateLpm:7.5, pressureBar:140, aliases:["advancedaquatak140","aa140","博世140","博世aa140"] },
+      { id:"yili-ylq4421g-t4-plus", brand:"亿力", model:"YLQ4421G T4 Plus", tier:"入门家用", powerWatts:2000, flowRateLpm:7.0, pressureBar:120, aliases:["4421","4421g","ylq4421g","ylq4421gt4plus","亿力4421","亿力4421g"] },
+      { id:"yili-ylq4430c", brand:"亿力", model:"YLQ4430C", tier:"家用甜点", powerWatts:1800, flowRateLpm:7.5, pressureBar:110, aliases:["ylq4430c","4430c","亿力4430c","亿力ylq4430c"] },
+      { id:"yili-ylq4450g", brand:"亿力", model:"YLQ4450G", tier:"均衡家用", powerWatts:2000, flowRateLpm:8.0, pressureBar:120, aliases:["ylq4450g","4450g","亿力4450g","亿力ylq4450g"] },
+      { id:"yili-ylq4650c", brand:"亿力", model:"YLQ4650C", tier:"均衡家用", powerWatts:2000, flowRateLpm:8.0, pressureBar:120, aliases:["ylq4650c","4650c","亿力4650c","亿力ylq4650c"] },
+      { id:"yili-ylq5680g", brand:"亿力", model:"YLQ5680G", tier:"大流量进阶", powerWatts:2200, flowRateLpm:9.5, pressureBar:130, aliases:["ylq5680g","5680g","亿力5680g","亿力ylq5680g"] },
+      { id:"lutian-dolphin-1400", brand:"绿田", model:"河豚 1400W 款", tier:"低压大水", powerWatts:1400, flowRateLpm:8.0, pressureBar:75, aliases:["河豚1400","绿田河豚","绿田河豚1400","lutian1400"] },
+      { id:"lutian-snow-panther-p4", brand:"绿田", model:"雪豹 P4", tier:"家用基础", powerWatts:1800, flowRateLpm:7.5, pressureBar:100, aliases:["雪豹p4","p4","绿田p4","绿田雪豹p4"] },
+      { id:"lutian-snow-panther-p5", brand:"绿田", model:"雪豹 P5", tier:"均衡家用", powerWatts:2000, flowRateLpm:8.5, pressureBar:120, aliases:["雪豹p5","p5","绿田p5","绿田雪豹p5"] },
+      { id:"lutian-snow-panther-p5-pro", brand:"绿田", model:"雪豹 P5 Pro", tier:"进阶家用", powerWatts:1800, flowRateLpm:10.0, pressureBar:130, aliases:["雪豹p5pro","p5pro","绿田p5pro","绿田雪豹p5pro"] },
+      { id:"blackcat-bm15-11", brand:"黑猫", model:"BM15/11", tier:"经典家用", powerWatts:1800, flowRateLpm:6.8, pressureBar:110, aliases:["bm1511","bm15/11","黑猫1511","黑猫bm1511"] },
+      { id:"blackcat-bm1522", brand:"黑猫", model:"BM1522", tier:"大流量进阶", powerWatts:2200, flowRateLpm:8.5, pressureBar:130, aliases:["bm1522","1522","黑猫1522","黑猫bm1522"] },
+      { id:"bogao-x-1613-pro", brand:"博高", model:"X-1613 Pro", tier:"家用重火力", powerWatts:3000, flowRateLpm:11.0, pressureBar:138, aliases:["x1613pro","x-1613pro","1613pro","博高1613","博高x1613pro"] },
+      { id:"worx-wu630", brand:"威克士", model:"WU630 (锂电无线)", tier:"便携锂电", powerWatts:180, flowRateLpm:3.0, pressureBar:25, aliases:["wu630","威克士wu630","威克士630","worxwu630"] },
+      { id:"worx-wu633", brand:"威克士", model:"WU633 (锂电无线)", tier:"便携锂电", powerWatts:250, flowRateLpm:3.5, pressureBar:80, aliases:["wu633","威克士wu633","威克士633","worxwu633"] },
+      { id:"anlu-hi-70", brand:"安露", model:"HI-70", tier:"入门家用", powerWatts:1400, flowRateLpm:5.5, pressureBar:70, aliases:["hi70","hi-70","安露hi70","安露1400w"] },
+      { id:"anlu-vdn-130", brand:"安露", model:"VDN-130", tier:"大流量进阶", powerWatts:2500, flowRateLpm:9.0, pressureBar:130, aliases:["vdn130","vdn-130","安露vdn130","安露2500w"] },
+      { id:"lavor-smart-110", brand:"拉瓦", model:"Smart 110", tier:"入门家用", powerWatts:1500, flowRateLpm:6.0, pressureBar:110, aliases:["smart110","拉瓦smart110","拉瓦110","lavorsmart110"] },
+      { id:"lavor-m1409", brand:"拉瓦", model:"Maine 1409", tier:"家用甜点", powerWatts:2800, flowRateLpm:9.0, pressureBar:140, aliases:["m1409","maine1409","拉瓦m1409","拉瓦maine1409","lavorm1409"] },
+      { id:"yardforce-f110c1", brand:"佳孚", model:"F110C1", tier:"入门家用", powerWatts:1400, flowRateLpm:5.5, pressureBar:110, aliases:["f110c1","f110c1m","佳孚f110","佳孚110","yardforce110"] },
+      { id:"yardforce-f120c2d", brand:"佳孚", model:"F120C2D", tier:"均衡家用", powerWatts:1600, flowRateLpm:6.5, pressureBar:120, aliases:["f120c2d","f120c1","f120c2m","佳孚f120","佳孚120","yardforce120"] }
+    ];
+
+    /* ===== DOM 引用 ===== */
+    const els = {
+      brandFilter: document.getElementById("brandFilterSelect"),
+      modelSearch: document.getElementById("modelSearchInput"),
+      washerModelList: document.getElementById("washerModelList"),
+      modelStatus: document.getElementById("modelStatus"),
+      power: document.getElementById("powerInput"),
+      flow: document.getElementById("flowInput"),
+      pressure: document.getElementById("pressureInput"),
+      currentNozzle: document.getElementById("currentNozzleInput"),
+      foamGoal: document.getElementById("foamGoalSelect"),
+      inputRuleHint: document.getElementById("inputRuleHint"),
+      powerFieldHint: document.getElementById("powerFieldHint"),
+      pressureFieldHint: document.getElementById("pressureFieldHint"),
+      calcBtn: document.getElementById("calcBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      resultArea: document.getElementById("resultArea"),
+      closestSize: document.getElementById("closestSize"),
+      rangeMinText: document.getElementById("rangeMinText"),
+      rangeMaxText: document.getElementById("rangeMaxText"),
+      nominalText: document.getElementById("nominalText"),
+      diameterMin: document.getElementById("diameterMin"),
+      diameterNominal: document.getElementById("diameterNominal"),
+      diameterMax: document.getElementById("diameterMax"),
+      consistencyBadge: document.getElementById("consistencyBadge"),
+      rangeFill: document.getElementById("rangeFill"),
+      rangeText: document.getElementById("rangeText"),
+      libraryList: document.getElementById("libraryList"),
+      adviceList: document.getElementById("adviceList"),
+      warningList: document.getElementById("warningList"),
+      reverseList: document.getElementById("reverseList"),
+      summaryList: document.getElementById("summaryList")
+    };
+
+    /* ===== 工具函数 ===== */
+    function lpmToM3s(flowLpm) { return flowLpm / 60000; }
+
+    function estimatePressureFromPower(powerWatts, flowRateLpm) {
+      const flowRateM3s = lpmToM3s(flowRateLpm);
+      const minBar = powerWatts * PUMP_EFFICIENCY_RANGE[0] / flowRateM3s / BAR_TO_PA;
+      const maxBar = powerWatts * PUMP_EFFICIENCY_RANGE[1] / flowRateM3s / BAR_TO_PA;
+      return { minBar, nominalBar: (minBar + maxBar) / 2, maxBar };
+    }
+
+    function nozzleDiameterMm(flowRateM3s, pressureDropPa, dischargeCoefficient) {
+      const areaM2 = flowRateM3s / (dischargeCoefficient * Math.sqrt(2 * pressureDropPa / WATER_DENSITY));
+      return Math.sqrt(4 * areaM2 / Math.PI) * 1000;
+    }
+
+    function closestStandard(sizeMm) {
+      return STANDARD_SIZES_MM.reduce((best, cur) => Math.abs(cur - sizeMm) < Math.abs(best - sizeMm) ? cur : best);
+    }
+
+    function parseOptionalNumber(value) {
+      if (value === "" || value === null || value === undefined) return null;
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : Number.NaN;
+    }
+
+    function normalizeModelText(value) {
+      return (value || "").toLowerCase().replace(/[\s()_.\-/]+/g, "").trim();
+    }
+
+    function modelDisplayName(m) { return `${m.brand} ${m.model}`; }
+    function modelSpecLine(m) { return `${m.powerWatts}W / ${m.flowRateLpm.toFixed(1)}L/min / ${m.pressureBar}bar`; }
+    function modelTagLine(m) { return `${m.tier} · ${modelSpecLine(m)}`; }
+    function getBrands() { return Array.from(new Set(WASHER_MODELS.map(m => m.brand))); }
+
+    function getFilteredModels(brand = els.brandFilter.value) {
+      return brand && brand !== "all" ? WASHER_MODELS.filter(m => m.brand === brand) : WASHER_MODELS;
+    }
+
+    function getDefaultModelStatus() {
+      const brand = els.brandFilter.value;
+      const filtered = getFilteredModels(brand);
+      return brand && brand !== "all"
+        ? `当前筛到 ${brand} 的 ${filtered.length} 个机型。`
+        : `内置 ${getBrands().length} 个品牌、${WASHER_MODELS.length} 个常见机型，直接输简称就能找。`;
+    }
+
+    function buildModelKeys(m) {
+      return [modelDisplayName(m), m.model, m.brand, m.id, ...(m.aliases || [])].map(normalizeModelText);
+    }
+
+    function searchWasherModels(query = els.modelSearch.value.trim(), brand = els.brandFilter.value) {
+      const nq = normalizeModelText(query);
+      const source = getFilteredModels(brand);
+      if (!nq) return source.map(m => ({ model: m, score: 0 }));
+      const tokens = query.split(/[\s/]+/).map(t => normalizeModelText(t)).filter(Boolean);
+      return source.map(m => {
+        const keys = buildModelKeys(m);
+        let score = 0;
+        keys.forEach(k => {
+          if (k === nq) score = Math.max(score, 220);
+          else if (k.startsWith(nq)) score = Math.max(score, 180);
+          else if (k.includes(nq)) score = Math.max(score, 145);
+          else if (nq.includes(k)) score = Math.max(score, 120);
+        });
+        if (tokens.length && tokens.every(t => keys.some(k => k.includes(t)))) score += 18 * tokens.length;
+        return { model: m, score };
+      }).filter(i => i.score > 0).sort((a, b) => b.score - a.score || a.model.powerWatts - b.model.powerWatts);
+    }
+
+    function findWasherModel(query = els.modelSearch.value.trim()) {
+      const matches = searchWasherModels(query);
+      if (!matches.length) return null;
+      const nq = normalizeModelText(query);
+      const exact = matches.find(({ model }) => buildModelKeys(model).includes(nq));
+      if (exact) return exact.model;
+      if (matches.length === 1 || matches[0].score - matches[1].score >= 35) return matches[0].model;
+      return null;
+    }
+
+    /* ===== 模型选择 ===== */
+    function getAppliedModel() {
+      const id = els.modelSearch.dataset.appliedId;
+      return WASHER_MODELS.find(m => m.id === id) || null;
+    }
+
+    function renderBrandOptions() {
+      const cur = els.brandFilter.value || "all";
+      els.brandFilter.innerHTML = [`<option value="all">全部品牌</option>`]
+        .concat(getBrands().map(b => `<option value="${b}">${b}</option>`)).join("");
+      els.brandFilter.value = getBrands().includes(cur) ? cur : "all";
+    }
+
+    function renderModelList(query = els.modelSearch.value.trim()) {
+      const matches = searchWasherModels(query);
+      const source = query ? matches.map(i => i.model) : getFilteredModels();
+      els.washerModelList.innerHTML = source.slice(0, 20).map(m =>
+        `<option value="${modelDisplayName(m)}" label="${modelTagLine(m)}"></option>`
+      ).join("");
+      return matches;
+    }
+
+    function updateModelStatus(msg) { els.modelStatus.textContent = msg; }
+
+    function previewModelMatches(query = els.modelSearch.value.trim()) {
+      const applied = getAppliedModel();
+      if (applied && query === modelDisplayName(applied)) {
+        updateModelStatus(`已选 ${modelDisplayName(applied)} · ${modelTagLine(applied)}`);
+        return;
+      }
+      if (!query) { updateModelStatus(getDefaultModelStatus()); return; }
+      const matches = renderModelList(query);
+      if (!matches.length) { updateModelStatus("没匹配到内置机型，可以切到手动输入。"); return; }
+      if (matches.length === 1) { updateModelStatus(`找到 ${modelDisplayName(matches[0].model)}，回车或选列表自动带参。`); return; }
+      updateModelStatus(`找到 ${matches.length} 个相近机型：${matches.slice(0, 3).map(i => modelDisplayName(i.model)).join(" / ")}…`);
+    }
+
+    function applyWasherModel(model, opts = {}) {
+      els.modelSearch.dataset.appliedId = model.id;
+      if (!opts.keepSearchText) els.modelSearch.value = modelDisplayName(model);
+      els.power.value = String(model.powerWatts);
+      els.flow.value = model.flowRateLpm.toFixed(1);
+      els.pressure.value = String(model.pressureBar);
+      renderModelList(modelDisplayName(model));
+      updateModelStatus(`已选 ${modelDisplayName(model)} · ${modelTagLine(model)}`);
+    }
+
+    function clearAppliedModel(opts = {}) {
+      delete els.modelSearch.dataset.appliedId;
+      if (!opts.keepMessage) updateModelStatus(getDefaultModelStatus());
+    }
+
+    function syncModelSelectionFromInput() {
+      const query = els.modelSearch.value.trim();
+      if (!query) { clearAppliedModel(); renderModelList(""); return null; }
+      const model = findWasherModel(query);
+      if (model) { applyWasherModel(model, { keepSearchText: false }); return model; }
+      renderModelList(query);
+      clearAppliedModel({ keepMessage: true });
+      return null;
+    }
+
+    /* ===== 输入状态 ===== */
+    function getInputState() {
+      const applied = getAppliedModel();
+      const pw = parseOptionalNumber(els.power.value.trim());
+      const fl = parseOptionalNumber(els.flow.value.trim());
+      const pr = parseOptionalNumber(els.pressure.value.trim());
+
+      if (fl === null || Number.isNaN(fl) || fl <= 0) return { ready: false, message: "先填流量。", mode: "missing-flow", modelProfile: applied };
+      if (pw !== null && (Number.isNaN(pw) || pw <= 0)) return { ready: false, message: "功率要大于 0。", mode: "bad-power", modelProfile: applied };
+      if (pr !== null && (Number.isNaN(pr) || pr <= 0)) return { ready: false, message: "压力要大于 0。", mode: "bad-pressure", modelProfile: applied };
+
+      if (pr !== null && pw !== null) return { ready: true, mode: "full", message: "功率 + 流量 + 压力，信息最全。", modelProfile: applied, spec: { powerWatts: pw, flowRateLpm: fl, pressureBar: pr, pressureEstimated: false, modelProfile: applied } };
+      if (pr !== null) return { ready: true, mode: "flow-pressure", message: "流量 + 压力，可以直接算。", modelProfile: applied, spec: { powerWatts: null, flowRateLpm: fl, pressureBar: pr, pressureEstimated: false, modelProfile: applied } };
+      if (pw !== null) {
+        const est = estimatePressureFromPower(pw, fl);
+        return { ready: true, mode: "flow-power", message: `流量 + 功率，估算压力约 ${est.nominalBar.toFixed(0)} bar。`, modelProfile: applied, spec: { powerWatts: pw, flowRateLpm: fl, pressureBar: est.nominalBar, pressureEstimated: true, modelProfile: applied }, pressureEstimate: est };
+      }
+      return { ready: false, mode: "incomplete", message: "至少需要：流量+压力 或 流量+功率。", modelProfile: applied };
+    }
+
+    function updateInputHints(state = getInputState()) {
+      els.inputRuleHint.textContent = state.message;
+    }
+
+    /* ===== 计算引擎 ===== */
+    function gradeConsistency(spec, pressureEstimate) {
+      if (!pressureEstimate) return { text: "未做功率校验", level: "warn" };
+      if (spec.pressureBar > pressureEstimate.maxBar * 1.15 || spec.pressureBar < pressureEstimate.minBar * 0.7) return { text: "工况冲突：建议复核", level: "danger" };
+      if (spec.pressureBar > pressureEstimate.maxBar || spec.pressureBar < pressureEstimate.minBar) return { text: "工况略飘：可用", level: "warn" };
+      return { text: "工况自洽", level: "good" };
+    }
+
+    function buildWarnings(spec, design) {
+      const w = [];
+      if (spec.pressureBar < 20) {
+        w.push({ level: "danger", text: "⚠️ 压力极低（< 20 bar），泡沫壶基本无法工作。这个功率/流量组合更适合普通浇花喷枪，不建议搭配 PA 壶。" });
+      } else if (spec.pressureBar < 50) {
+        w.push({ level: "danger", text: "压力偏低（< 50 bar），PA 壶大概率只能出稀泡，建议考虑手持发泡喷壶作为替代。" });
+      }
+      if (spec.flowRateLpm < 5) w.push({ level: "warn", text: "流量偏小（< 5 L/min），覆盖效率会慢。" });
+      if (spec.flowRateLpm > 12) w.push({ level: "warn", text: "流量偏大，1.1~1.3 mm 喷芯可能限制流量。" });
+      if (design.nominalMm > 1.8) w.push({ level: "warn", text: "推荐喷芯偏大（> 1.8mm），泡沫细腻度通常不如高压小喷芯。" });
+      if (design.nominalMm > 1.5 && spec.pressureBar < 50) w.push({ level: "danger", text: "低压 + 大喷芯 = 几乎没有发泡效果。喷芯越大压差越小，泡沫越稀。" });
+      if (design.nominalMm < 1.0) w.push({ level: "warn", text: "推荐喷芯偏小，堵塞风险增加。" });
+      if (design.powerPressure) {
+        if (spec.pressureBar > design.powerPressure.maxBar * 1.15) w.push({ level: "danger", text: "压力偏高，三个参数可能不能同时成立。" });
+        if (spec.pressureBar < design.powerPressure.minBar * 0.7) w.push({ level: "warn", text: "压力偏低，可能不是额定工况。" });
+      } else {
+        w.push({ level: "warn", text: "没填功率，跳过一致性校验。" });
+      }
+      if (!w.length) w.push({ level: "good", text: "参数没有明显硬伤，剩下看药液比例、发泡网和进气结构。" });
+      return w;
+    }
+
+    function buildAdvice(spec, design) {
+      const a = [];
+
+      // 对超低压场景优先给替代建议
+      if (spec.pressureBar < 20) {
+        a.push({ level: "danger", text: "💡 建议：这个配置不适合泡沫壶。可以考虑手持气压喷壶（IK Foam 系列）或者直接手洗。" });
+        a.push({ level: "warn", text: "如果一定要试，用最小喷芯（1.1mm）+ 高浓度药液 + 热水，但效果预期要放低。" });
+        return a;
+      }
+
+      if (spec.pressureBar < 50) {
+        a.push({ level: "warn", text: "💡 压力偏低，PA 壶效果有限。考虑手持发泡喷壶（如 IK Foam 9）作为替代，或者用最小喷芯 1.1mm 尝试。" });
+      }
+
+      a.push({ level: "good", text: `想更浓，靠近下限 ${design.minMm.toFixed(2)} mm。` });
+      a.push({ level: "warn", text: `想稳妥，先试 ${design.closestStandard.toFixed(2)} mm。` });
+      a.push({ level: "good", text: `想减少憋压，往上限 ${design.maxMm.toFixed(2)} mm 走。` });
+
+      const [spMin, spMax] = MJJC_3_BASELINE.pressureSweetSpotBar;
+      const [snMin, snMax] = MJJC_3_BASELINE.nozzleSweetSpotMm;
+      if (spec.pressureBar >= spMin && spec.pressureBar <= spMax && design.closestStandard >= snMin && design.closestStandard <= snMax) {
+        a.unshift({ level: "good", text: `正落在 MJJC 3.0 甜点带：${spMin}~${spMax} bar / ${snMin.toFixed(2)}~${snMax.toFixed(2)} mm。` });
+      } else if (spec.pressureBar >= 50) {
+        a.unshift({ level: "warn", text: "稍偏离 MJJC 3.0 甜点带，按需取舍。" });
+      }
+      return a;
+    }
+
+    function buildLibraryCandidates(design) {
+      const mid = design.nominalMm;
+      const rangeCenter = (design.minMm + design.maxMm) / 2;
+      const candidates = STANDARD_SIZES_MM.map(size => {
+        const delta = Math.abs(size - mid);
+        const inRange = size >= design.minMm && size <= design.maxMm;
+        let label = "可试", level = "warn", note = `距标称 ${delta.toFixed(2)} mm`;
+        if (delta < 0.06) { label = "首选"; level = "good"; note = "和标称推荐几乎贴脸。"; }
+        else if (inRange) {
+          if (size < rangeCenter) { label = "偏浓泡"; level = "good"; note = "在区间内，倾向更浓。"; }
+          else { label = "偏通用"; level = "warn"; note = "在区间内，偏稳妥。"; }
+        } else if (size < design.minMm) { label = "偏激进"; level = "danger"; note = "比推荐区间还小，更容易憋压。"; }
+        else { label = "偏保守"; level = "danger"; note = "比推荐区间还大，泡更稀。"; }
+        return { size, delta, label, level, note };
+      });
+      // 修复：按喷芯尺寸升序排列，而不是按delta
+      return candidates.sort((a, b) => a.delta - b.delta).slice(0, 5).sort((a, b) => a.size - b.size);
+    }
+
+    function closestStandardWithinRange(target, rangeMin, rangeMax) {
+      const inRange = STANDARD_SIZES_MM.filter(s => s >= rangeMin - 0.02 && s <= rangeMax + 0.02);
+      const source = inRange.length ? inRange : STANDARD_SIZES_MM;
+      return source.reduce((best, cur) => Math.abs(cur - target) < Math.abs(best - target) ? cur : best);
+    }
+
+    function buildReverseSuggestions(design) {
+      const cn = parseOptionalNumber(els.currentNozzle.value.trim());
+      const gk = els.foamGoal.value;
+      const goal = REVERSE_GOALS[gk] || REVERSE_GOALS.balanced;
+
+      if (cn === null) {
+        return { items: [
+          { level: "warn", text: `填上当前喷芯，按"${goal.label}"告诉你该换到哪档。` },
+          { level: "good", text: `当前推荐 ${design.closestStandard.toFixed(2)} mm，以它为基准。` }
+        ]};
+      }
+      if (Number.isNaN(cn) || cn <= 0) return { items: [{ level: "danger", text: "当前喷芯要大于 0。" }] };
+
+      const cs = closestStandard(cn);
+      const gt = {
+        denser: closestStandardWithinRange(Math.max(design.minMm, design.nominalMm - 0.07), design.minMm, design.maxMm),
+        balanced: closestStandardWithinRange(design.nominalMm, design.minMm, design.maxMm),
+        looser: closestStandardWithinRange(Math.min(design.maxMm, design.nominalMm + 0.08), design.minMm, design.maxMm)
+      };
+      const ts = gt[gk] || gt.balanced;
+      const pos = cn < design.minMm - 0.03 ? "偏激进" : cn > design.maxMm + 0.03 ? "偏保守" : "落在推荐区间里";
+      const delta = ts - cs;
+      const dir = delta < -0.001 ? "smaller" : delta > 0.001 ? "larger" : "hold";
+      const si = STANDARD_SIZES_MM.indexOf(cs);
+      const ns = dir === "smaller" ? STANDARD_SIZES_MM[Math.max(0, si - 1)] : dir === "larger" ? STANDARD_SIZES_MM[Math.min(STANDARD_SIZES_MM.length - 1, si + 1)] : cs;
+      const sc = Math.round(Math.abs(STANDARD_SIZES_MM.indexOf(ts) - si));
+
+      const items = [
+        { level: pos === "落在推荐区间里" ? "good" : "warn", text: `当前 ${cn.toFixed(2)} mm（标准件 ${cs.toFixed(2)} mm），${pos}。` },
+        { level: "warn", text: `${goal.label}：${goal.hint}` }
+      ];
+      if (dir === "hold") {
+        items.push({ level: "good", text: `${cs.toFixed(2)} mm 已接近最佳点，优先调药液和发泡网。` });
+      } else if (dir === "smaller") {
+        items.push({ level: "good", text: `建议先试 ${ns.toFixed(2)} mm，目标 ${ts.toFixed(2)} mm（往小 ${sc} 档）。` });
+      } else {
+        items.push({ level: "good", text: `建议先试 ${ns.toFixed(2)} mm，目标 ${ts.toFixed(2)} mm（往大 ${sc} 档）。` });
+      }
+      return { items };
+    }
+
+    function calculate(spec) {
+      const flowRateM3s = lpmToM3s(spec.flowRateLpm);
+      const powerPressure = spec.powerWatts !== null ? estimatePressureFromPower(spec.powerWatts, spec.flowRateLpm) : null;
+      const supplyPressurePa = spec.pressureBar * BAR_TO_PA;
+      const [cdMin, cdMax] = DISCHARGE_COEFFICIENT_RANGE;
+      const [prMin, prMax] = NOZZLE_PRESSURE_RATIO_RANGE;
+      const cdNom = (cdMin + cdMax) / 2, prNom = (prMin + prMax) / 2;
+      const dpMinPa = supplyPressurePa * prMin, dpMaxPa = supplyPressurePa * prMax, dpNomPa = supplyPressurePa * prNom;
+      const minMm = nozzleDiameterMm(flowRateM3s, dpMaxPa, cdMax);
+      const nominalMm = nozzleDiameterMm(flowRateM3s, dpNomPa, cdNom);
+      const maxMm = nozzleDiameterMm(flowRateM3s, dpMinPa, cdMin);
+      const jetVMin = cdNom * Math.sqrt(2 * dpMinPa / WATER_DENSITY);
+      const jetVMax = cdNom * Math.sqrt(2 * dpMaxPa / WATER_DENSITY);
+      const hp = supplyPressurePa * flowRateM3s;
+
+      const design = { minMm, nominalMm, maxMm, closestStandard: closestStandard(nominalMm), dpMinBar: dpMinPa / BAR_TO_PA, dpMaxBar: dpMaxPa / BAR_TO_PA, jetVelocityMin: jetVMin, jetVelocityMax: jetVMax, hydraulicPower: hp, requiredInputPowerMin: hp / PUMP_EFFICIENCY_RANGE[1], requiredInputPowerMax: hp / PUMP_EFFICIENCY_RANGE[0], powerPressure };
+
+      return {
+        spec, design,
+        consistency: gradeConsistency(spec, powerPressure),
+        warnings: buildWarnings(spec, design),
+        advice: buildAdvice(spec, design),
+        candidates: buildLibraryCandidates(design)
+      };
+    }
+
+    /* ===== 渲染 ===== */
+    function renderMessages(container, items) {
+      container.innerHTML = items.map(i => `<div class="msg-card ${i.level}">${i.text}</div>`).join("");
+    }
+
+    function renderCandidates(candidates) {
+      els.libraryList.innerHTML = candidates.map(c => `
+        <article class="candidate">
+          <div class="candidate-main">${c.size.toFixed(2)}<small style="font-size:16px;"> mm</small></div>
+          <div class="candidate-copy"><strong>${c.label}</strong><p>${c.note}</p></div>
+          <div class="pill ${c.level}">${c.label}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderSummary(spec, design) {
+      const items = [
+        { level: "good", text: `有效压差 ${design.dpMinBar.toFixed(1)} ~ ${design.dpMaxBar.toFixed(1)} bar` },
+        { level: "warn", text: `流速 ${design.jetVelocityMin.toFixed(1)} ~ ${design.jetVelocityMax.toFixed(1)} m/s` },
+        { level: "good", text: `液压功率 ${design.hydraulicPower.toFixed(0)} W，需输入功率 ${design.requiredInputPowerMin.toFixed(0)}~${design.requiredInputPowerMax.toFixed(0)} W` }
+      ];
+      if (spec.modelProfile) items.unshift({ level: "good", text: `机型：${modelDisplayName(spec.modelProfile)}（${spec.modelProfile.tier}）` });
+      if (design.powerPressure && spec.powerWatts !== null) {
+        items.push({ level: "warn", text: `按 ${spec.powerWatts}W + ${spec.flowRateLpm.toFixed(1)}L/min 反推，压力约 ${design.powerPressure.minBar.toFixed(0)}~${design.powerPressure.maxBar.toFixed(0)} bar` });
+      }
+      renderMessages(els.summaryList, items);
+    }
+
+    function render(result) {
+      const { spec, design, consistency, warnings, advice, candidates } = result;
+      const reverse = buildReverseSuggestions(design);
+
+      // 显示结果区
+      els.resultArea.classList.add("show");
+
+      // 主结果
+      els.closestSize.textContent = design.closestStandard.toFixed(2);
+      els.rangeMinText.textContent = design.minMm.toFixed(2);
+      els.rangeMaxText.textContent = design.maxMm.toFixed(2);
+      els.nominalText.textContent = design.nominalMm.toFixed(2);
+
+      // 三张小卡片
+      els.diameterMin.textContent = design.minMm.toFixed(2);
+      els.diameterNominal.textContent = design.nominalMm.toFixed(2);
+      els.diameterMax.textContent = design.maxMm.toFixed(2);
+
+      // 一致性
+      els.consistencyBadge.textContent = consistency.text;
+      els.consistencyBadge.className = `consistency-badge ${consistency.level}`;
+
+      // 区间条
+      const libMin = STANDARD_SIZES_MM[0], libMax = STANDARD_SIZES_MM[STANDARD_SIZES_MM.length - 1];
+      const leftPct = ((design.minMm - libMin) / (libMax - libMin)) * 100;
+      const widthPct = ((design.maxMm - design.minMm) / (libMax - libMin)) * 100;
+      els.rangeFill.style.left = `${Math.max(0, Math.min(leftPct, 100))}%`;
+      els.rangeFill.style.width = `${Math.max(6, Math.min(widthPct, 100 - leftPct))}%`;
+      els.rangeText.textContent = `当前推荐：${design.minMm.toFixed(2)} ~ ${design.maxMm.toFixed(2)} mm` + (spec.pressureEstimated ? "（压力为估算）" : "");
+
+      // 详情列表
+      renderCandidates(candidates);
+      renderMessages(els.adviceList, advice);
+      renderMessages(els.warningList, warnings);
+      renderMessages(els.reverseList, reverse.items);
+      renderSummary(spec, design);
+
+      // 滚动到结果
+      els.resultArea.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    /* ===== 不适配判断 ===== */
+    function checkNotRecommended(spec) {
+      const pw = spec.powerWatts;
+      const pr = spec.pressureBar;
+      const fl = spec.flowRateLpm;
+
+      // 锂电/超低功率机器（≤ 500W）
+      if (pw !== null && pw <= 500) {
+        return {
+          blocked: true,
+          title: "锂电便携机不建议搭配泡沫壶",
+          reason: `${pw}W 的功率和 ${pr} bar 的压力远低于泡沫壶的工作门槛。泡沫壶需要持续高压（≥ 60 bar）推动水通过小喷芯来发泡，锂电机的压力和流量都不够。`,
+          details: [
+            { level: "danger", text: `功率 ${pw}W，泡沫壶通常需要 ≥ 1200W` },
+            { level: "danger", text: `压力 ${pr} bar，泡沫壶通常需要 ≥ 60 bar` },
+            { level: "warn", text: `流量 ${fl.toFixed(1)} L/min，覆盖效率也会很慢` },
+            { level: "warn", text: "小喷芯推不动水、大喷芯没有压差，两种都发不出泡" }
+          ],
+          alternatives: [
+            { level: "good", text: "🧴 手持气压发泡喷壶（IK Foam 9 / MJJC 手持泡壶）— 不依赖水压，手动打气发泡，效果不错" },
+            { level: "good", text: "🪣 两桶水洗法 — 一桶泡沫水、一桶清水，配合洗车手套，最经典的无泡沫壶方案" },
+            { level: "warn", text: "💡 如果特别想要泡沫壶体验，建议升级到 1500W+ 的有线洗车机" }
+          ]
+        };
+      }
+
+      // 低功率有线机（500~1200W）或已知低压（< 60 bar）
+      if ((pw !== null && pw > 500 && pw < 1200) || (pr < 60)) {
+        const powerNote = pw !== null ? `功率 ${pw}W` : "功率未知";
+        return {
+          blocked: true,
+          title: "该配置不建议搭配泡沫壶",
+          reason: `${powerNote}、${pr} bar 的压力处于泡沫壶的"勉强区"。物理上，小喷芯推不动（压力不够），大喷芯没压差（不发泡），两头都不讨好。`,
+          details: [
+            { level: "danger", text: `压力 ${pr} bar，PA 壶高效发泡通常需要 ≥ 80 bar` },
+            pw !== null ? { level: "warn", text: `功率 ${pw}W，建议 ≥ 1200W` } : null,
+            { level: "warn", text: "即使勉强出泡，也会是水多泡少、覆盖慢" },
+            { level: "warn", text: "强行使用还可能导致水泵过载、接头漏水" }
+          ].filter(Boolean),
+          alternatives: [
+            { level: "good", text: "🧴 手持气压发泡喷壶 — 不吃水压，发泡效果稳定，30~80 元搞定" },
+            { level: "good", text: "🪣 直接用稀释好的洗车液 + 洗车手套，跳过泡沫环节" },
+            { level: "warn", text: "💡 如果压力刚好在 60~80 bar 之间，可以用最小喷芯 1.1mm + 高浓度药液试试运气" }
+          ]
+        };
+      }
+
+      return { blocked: false };
+    }
+
+    function renderNotRecommended(nr, spec) {
+      const area = document.getElementById("notRecommendedArea");
+      document.getElementById("notRecTitle").textContent = nr.title;
+      document.getElementById("notRecReason").textContent = nr.reason;
+      renderMessages(document.getElementById("notRecDetails"), nr.details);
+      renderMessages(document.getElementById("notRecAlternatives"), nr.alternatives);
+      
+      // 隐藏正常结果，显示不建议面板
+      els.resultArea.classList.remove("show");
+      area.style.display = "block";
+      area.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function runCalculation(opts = {}) {
+      const state = getInputState();
+      updateInputHints(state);
+      if (!state.ready) {
+        if (!opts.silent) alert(state.message);
+        return;
+      }
+
+      // 判断是否不适配
+      const nr = checkNotRecommended(state.spec);
+      if (nr.blocked) {
+        renderNotRecommended(nr, state.spec);
+        return;
+      }
+
+      // 正常计算
+      document.getElementById("notRecommendedArea").style.display = "none";
+      render(calculate(state.spec));
+    }
+
+    function resetDefaults() {
+      els.brandFilter.value = "all";
+      els.modelSearch.value = "";
+      clearAppliedModel();
+      els.power.value = "";
+      els.flow.value = "8";
+      els.pressure.value = "100";
+      els.currentNozzle.value = "";
+      els.foamGoal.value = "balanced";
+      renderModelList("");
+      updateModelStatus(getDefaultModelStatus());
+      els.resultArea.classList.remove("show");
+      document.getElementById("notRecommendedArea").style.display = "none";
+    }
+
+    /* ===== 模式切换 ===== */
+    document.querySelectorAll(".mode-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".mode-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById("panelBrand").classList.toggle("active", tab.dataset.mode === "brand");
+        document.getElementById("panelCustom").classList.toggle("active", tab.dataset.mode === "custom");
+      });
+    });
+
+    /* ===== 事件绑定 ===== */
+    els.calcBtn.addEventListener("click", () => {
+      const isBrandMode = document.getElementById("panelBrand").classList.contains("active");
+      if (isBrandMode) syncModelSelectionFromInput();
+      runCalculation({ silent: false });
+    });
+    els.resetBtn.addEventListener("click", resetDefaults);
+
+    /* 手机端固定按钮 */
+    const mobileCalcBtn = document.getElementById("mobileCalcBtn");
+    if (mobileCalcBtn) {
+      mobileCalcBtn.addEventListener("click", () => {
+        const isBrandMode = document.getElementById("panelBrand").classList.contains("active");
+        if (isBrandMode) syncModelSelectionFromInput();
+        runCalculation({ silent: false });
+      });
+    }
+
+    els.brandFilter.addEventListener("change", () => {
+      els.modelSearch.value = "";
+      clearAppliedModel();
+      renderModelList("");
+      previewModelMatches();
+    });
+
+    els.modelSearch.addEventListener("input", () => {
+      const applied = getAppliedModel();
+      if (applied && els.modelSearch.value.trim() !== modelDisplayName(applied)) clearAppliedModel({ keepMessage: true });
+      previewModelMatches();
+    });
+    els.modelSearch.addEventListener("change", () => { syncModelSelectionFromInput(); });
+    els.modelSearch.addEventListener("blur", () => { syncModelSelectionFromInput(); });
+
+    [els.power, els.flow, els.pressure].forEach(input => {
+      input.addEventListener("input", function () {
+        // 过滤非数字字符（保留数字和一个小数点）
+        let v = this.value;
+        // 去掉除数字和 . 之外的字符
+        v = v.replace(/[^\d.]/g, "");
+        // 只保留第一个小数点
+        const parts = v.split(".");
+        if (parts.length > 2) v = parts[0] + "." + parts.slice(1).join("");
+        if (v !== this.value) this.value = v;
+        updateInputHints();
+      });
+      input.addEventListener("change", () => updateInputHints());
+      // 聚焦时全选，方便用户直接输入覆盖
+      input.addEventListener("focus", function () {
+        const self = this;
+        setTimeout(() => { self.select(); }, 0);
+      });
+    });
+
+    els.currentNozzle.addEventListener("input", function () {
+      let v = this.value.replace(/[^\d.]/g, "");
+      const parts = v.split(".");
+      if (parts.length > 2) v = parts[0] + "." + parts.slice(1).join("");
+      if (v !== this.value) this.value = v;
+    });
+    els.currentNozzle.addEventListener("change", () => {
+      if (els.resultArea.classList.contains("show")) runCalculation({ silent: true });
+    });
+    els.currentNozzle.addEventListener("focus", function () {
+      const self = this;
+      setTimeout(() => { self.select(); }, 0);
+    });
+    els.foamGoal.addEventListener("change", () => {
+      if (els.resultArea.classList.contains("show")) runCalculation({ silent: true });
+    });
+
+
+    /* ===== 折叠详情 ===== */
+    document.getElementById("detailToggle").addEventListener("click", function () {
+      this.classList.toggle("open");
+      document.getElementById("detailBody").classList.toggle("open");
+    });
+
+    document.getElementById("catalogToggle").addEventListener("click", function () {
+      this.classList.toggle("open");
+      document.getElementById("catalogBody").classList.toggle("open");
+    });
+
+    /* ===== 初始化 ===== */
+    renderBrandOptions();
+    renderModelList("");
+    updateModelStatus(getDefaultModelStatus());
+    document.getElementById("catalogCountText").textContent = `${getBrands().length} 品牌 / ${WASHER_MODELS.length} 机型`;
+
+    /* ===== 功率一览表 ===== */
+    (function initPowerCatalog() {
+      const tabsC = document.getElementById("catalogBrandTabs");
+      const contentC = document.getElementById("catalogContent");
+      const brands = getBrands();
+
+      const allTab = document.createElement("button");
+      allTab.className = "catalog-brand-tab active";
+      allTab.textContent = `全部 (${WASHER_MODELS.length})`;
+      allTab.dataset.brand = "__all__";
+      tabsC.appendChild(allTab);
+
+      brands.forEach(b => {
+        const count = WASHER_MODELS.filter(m => m.brand === b).length;
+        const tab = document.createElement("button");
+        tab.className = "catalog-brand-tab";
+        tab.textContent = `${b} (${count})`;
+        tab.dataset.brand = b;
+        tabsC.appendChild(tab);
+      });
+
+      tabsC.addEventListener("click", e => {
+        const tab = e.target.closest(".catalog-brand-tab");
+        if (!tab) return;
+        tabsC.querySelectorAll(".catalog-brand-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        renderCat(tab.dataset.brand);
+      });
+
+      function renderCat(filter) {
+        const showAll = filter === "__all__";
+        const grouped = showAll ? brands : brands.filter(b => b === filter);
+        contentC.innerHTML = "";
+        grouped.forEach(brand => {
+          const models = WASHER_MODELS.filter(m => m.brand === brand);
+          if (!models.length) return;
+          const g = document.createElement("div");
+          g.className = "catalog-brand-group";
+          g.innerHTML = `<div class="catalog-brand-name">${brand}<span style="color:var(--muted);font-weight:400;font-size:.75rem;margin-left:.4rem">${models.length} 款</span></div>`;
+          const grid = document.createElement("div");
+          grid.className = "catalog-grid";
+          models.forEach(model => {
+            const card = document.createElement("div");
+            card.className = "catalog-card";
+            card.innerHTML = `
+              <div>
+                <div class="catalog-card-model">${model.model}</div>
+                <div class="catalog-card-specs">
+                  <span class="spec-chip power">${model.powerWatts}W</span>
+                  <span class="spec-chip">${model.flowRateLpm}L/min</span>
+                  <span class="spec-chip">${model.pressureBar}bar</span>
+                </div>
+                <div class="catalog-card-tier">${model.tier}</div>
+              </div>
+              <button class="catalog-card-action" title="一键带入计算器" data-model-id="${model.id}">算</button>
+            `;
+            grid.appendChild(card);
+          });
+          g.appendChild(grid);
+          contentC.appendChild(g);
+        });
+
+        contentC.querySelectorAll(".catalog-card-action").forEach(btn => {
+          btn.addEventListener("click", e => {
+            e.stopPropagation();
+            const model = WASHER_MODELS.find(m => m.id === btn.dataset.modelId);
+            if (!model) return;
+            applyWasherModel(model);
+            runCalculation({ silent: false });
+          });
+        });
+      }
+
+      renderCat("__all__");
+    })();
+
+    /* ===== 建议 & 勘误逻辑 ===== */
+    (() => {
+      const toggle = document.getElementById("feedbackToggle");
+      const body = document.getElementById("feedbackBody");
+      const typeTabs = document.querySelectorAll(".feedback-type-tab");
+      const panels = document.querySelectorAll(".feedback-panel");
+      const copyBtn = document.getElementById("fbCopyBtn");
+      const successEl = document.getElementById("fbSuccess");
+
+      // 折叠 / 展开
+      toggle.addEventListener("click", () => {
+        const isOpen = body.classList.toggle("open");
+        toggle.classList.toggle("open", isOpen);
+      });
+
+      // 类型切换
+      typeTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          typeTabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          const type = tab.dataset.fbtype;
+          panels.forEach(p => p.classList.remove("active"));
+          document.getElementById(type === "errata" ? "fbPanelErrata" : "fbPanelSuggestion").classList.add("active");
+          successEl.classList.remove("show");
+        });
+      });
+
+      // 输入过滤：功率和流量只允许数字和小数点
+      ["fbPower", "fbFlow", "fbPressure"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("input", () => {
+          el.value = el.value.replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1");
+        });
+      });
+
+      // 获取当前激活的类型
+      function getActiveType() {
+        const activeTab = document.querySelector(".feedback-type-tab.active");
+        return activeTab ? activeTab.dataset.fbtype : "errata";
+      }
+
+      // 校验必填字段
+      function validateFeedback() {
+        const type = getActiveType();
+        if (type === "errata") {
+          const brand = document.getElementById("fbBrand").value.trim();
+          const model = document.getElementById("fbModel").value.trim();
+          const power = document.getElementById("fbPower").value.trim();
+          const flow = document.getElementById("fbFlow").value.trim();
+          if (!brand || !model || !power || !flow) {
+            return { ok: false, msg: "品牌、型号、功率、流量为必填项" };
+          }
+          return { ok: true };
+        } else {
+          const text = document.getElementById("fbSuggestionText").value.trim();
+          if (!text) {
+            return { ok: false, msg: "请填写你的建议内容" };
+          }
+          return { ok: true };
+        }
+      }
+
+      // 生成反馈文本
+      function buildFeedbackText() {
+        const type = getActiveType();
+        const lines = [];
+        lines.push("===== PA壶喷芯估算台 — 反馈 =====");
+        lines.push("");
+        if (type === "errata") {
+          const errataType = document.getElementById("fbErrataType").value;
+          lines.push("【类型】" + (errataType === "correction" ? "参数纠错" : "新增机型"));
+          lines.push("【品牌】" + document.getElementById("fbBrand").value.trim());
+          lines.push("【型号】" + document.getElementById("fbModel").value.trim());
+          lines.push("【功率】" + document.getElementById("fbPower").value.trim() + " W");
+          lines.push("【流量】" + document.getElementById("fbFlow").value.trim() + " L/h");
+          const pressure = document.getElementById("fbPressure").value.trim();
+          if (pressure) lines.push("【压力】" + pressure + " bar");
+          const note = document.getElementById("fbErrataNote").value.trim();
+          if (note) {
+            lines.push("【说明】" + note);
+          }
+        } else {
+          lines.push("【类型】应用建议");
+          lines.push("【内容】");
+          lines.push(document.getElementById("fbSuggestionText").value.trim());
+        }
+        lines.push("");
+        lines.push("====================================");
+        return lines.join("\n");
+      }
+
+      // 复制到剪贴板
+      copyBtn.addEventListener("click", async () => {
+        const v = validateFeedback();
+        if (!v.ok) {
+          alert(v.msg);
+          return;
+        }
+        const text = buildFeedbackText();
+        try {
+          await navigator.clipboard.writeText(text);
+          successEl.classList.add("show");
+          setTimeout(() => successEl.classList.remove("show"), 4000);
+        } catch (e) {
+          // fallback
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          successEl.classList.add("show");
+          setTimeout(() => successEl.classList.remove("show"), 4000);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
