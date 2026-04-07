@@ -1189,8 +1189,9 @@
             </label>
             <label>
               <span>型号</span>
-              <input id="modelSearchInput" type="text" list="washerModelList" value="" placeholder="K5 / 雪豹 P5 / BM1522" />
-              <datalist id="washerModelList"></datalist>
+              <select id="modelSelectInput">
+                <option value="">请先选品牌</option>
+              </select>
             </label>
           </div>
           <div id="modelStatus" class="inline-status">内置 10 个品牌、30 个常见机型，选好型号自动带入参数。</div>
@@ -1519,8 +1520,7 @@
     /* ===== DOM 引用 ===== */
     const els = {
       brandFilter: document.getElementById("brandFilterSelect"),
-      modelSearch: document.getElementById("modelSearchInput"),
-      washerModelList: document.getElementById("washerModelList"),
+      modelSelect: document.getElementById("modelSelectInput"),
       modelStatus: document.getElementById("modelStatus"),
       power: document.getElementById("powerInput"),
       flow: document.getElementById("flowInput"),
@@ -1600,7 +1600,7 @@
       return [modelDisplayName(m), m.model, m.brand, m.id, ...(m.aliases || [])].map(normalizeModelText);
     }
 
-    function searchWasherModels(query = els.modelSearch.value.trim(), brand = els.brandFilter.value) {
+    function searchWasherModels(query = "", brand = els.brandFilter.value) {
       const nq = normalizeModelText(query);
       const source = getFilteredModels(brand);
       if (!nq) return source.map(m => ({ model: m, score: 0 }));
@@ -1619,7 +1619,7 @@
       }).filter(i => i.score > 0).sort((a, b) => b.score - a.score || a.model.powerWatts - b.model.powerWatts);
     }
 
-    function findWasherModel(query = els.modelSearch.value.trim()) {
+    function findWasherModel(query = "") {
       const matches = searchWasherModels(query);
       if (!matches.length) return null;
       const nq = normalizeModelText(query);
@@ -1631,8 +1631,8 @@
 
     /* ===== 模型选择 ===== */
     function getAppliedModel() {
-      const id = els.modelSearch.dataset.appliedId;
-      return WASHER_MODELS.find(m => m.id === id) || null;
+      const id = els.modelSelect.value;
+      return id ? WASHER_MODELS.find(m => m.id === id) || null : null;
     }
 
     function renderBrandOptions() {
@@ -1642,52 +1642,47 @@
       els.brandFilter.value = getBrands().includes(cur) ? cur : "all";
     }
 
-    function renderModelList(query = els.modelSearch.value.trim()) {
-      const matches = searchWasherModels(query);
-      const source = query ? matches.map(i => i.model) : getFilteredModels();
-      els.washerModelList.innerHTML = source.slice(0, 20).map(m =>
-        `<option value="${modelDisplayName(m)}" label="${modelTagLine(m)}"></option>`
-      ).join("");
-      return matches;
+    function renderModelList() {
+      const models = getFilteredModels();
+      const curVal = els.modelSelect.value;
+      els.modelSelect.innerHTML = '<option value="">请选择机型</option>' +
+        models.map(m => `<option value="${m.id}">${modelDisplayName(m)} · ${modelTagLine(m)}</option>`).join("");
+      // 保持之前的选中状态（如果还在列表中）
+      if (curVal && models.some(m => m.id === curVal)) {
+        els.modelSelect.value = curVal;
+      } else {
+        els.modelSelect.value = "";
+      }
     }
 
     function updateModelStatus(msg) { els.modelStatus.textContent = msg; }
 
-    function previewModelMatches(query = els.modelSearch.value.trim()) {
+    function previewModelMatches() {
       const applied = getAppliedModel();
-      if (applied && query === modelDisplayName(applied)) {
+      if (applied) {
         updateModelStatus(`已选 ${modelDisplayName(applied)} · ${modelTagLine(applied)}`);
-        return;
+      } else {
+        updateModelStatus(getDefaultModelStatus());
       }
-      if (!query) { updateModelStatus(getDefaultModelStatus()); return; }
-      const matches = renderModelList(query);
-      if (!matches.length) { updateModelStatus("没匹配到内置机型，可以切到手动输入。"); return; }
-      if (matches.length === 1) { updateModelStatus(`找到 ${modelDisplayName(matches[0].model)}，回车或选列表自动带参。`); return; }
-      updateModelStatus(`找到 ${matches.length} 个相近机型：${matches.slice(0, 3).map(i => modelDisplayName(i.model)).join(" / ")}…`);
     }
 
-    function applyWasherModel(model, opts = {}) {
-      els.modelSearch.dataset.appliedId = model.id;
-      if (!opts.keepSearchText) els.modelSearch.value = modelDisplayName(model);
+    function applyWasherModel(model) {
+      els.modelSelect.value = model.id;
       els.power.value = String(model.powerWatts);
       els.flow.value = model.flowRateLpm.toFixed(1);
       els.pressure.value = String(model.pressureBar);
-      renderModelList(modelDisplayName(model));
       updateModelStatus(`已选 ${modelDisplayName(model)} · ${modelTagLine(model)}`);
     }
 
     function clearAppliedModel(opts = {}) {
-      delete els.modelSearch.dataset.appliedId;
+      els.modelSelect.value = "";
       if (!opts.keepMessage) updateModelStatus(getDefaultModelStatus());
     }
 
     function syncModelSelectionFromInput() {
-      const query = els.modelSearch.value.trim();
-      if (!query) { clearAppliedModel(); renderModelList(""); return null; }
-      const model = findWasherModel(query);
-      if (model) { applyWasherModel(model, { keepSearchText: false }); return model; }
-      renderModelList(query);
-      clearAppliedModel({ keepMessage: true });
+      const model = getAppliedModel();
+      if (model) { applyWasherModel(model); return model; }
+      clearAppliedModel();
       return null;
     }
 
@@ -2019,14 +2014,14 @@
 
     function resetDefaults() {
       els.brandFilter.value = "all";
-      els.modelSearch.value = "";
+      els.modelSelect.value = "";
       clearAppliedModel();
       els.power.value = "";
       els.flow.value = "8";
       els.pressure.value = "100";
       els.currentNozzle.value = "";
       els.foamGoal.value = "balanced";
-      renderModelList("");
+      renderModelList();
       updateModelStatus(getDefaultModelStatus());
       els.resultArea.classList.remove("show");
       document.getElementById("notRecommendedArea").style.display = "none";
@@ -2061,19 +2056,16 @@
     }
 
     els.brandFilter.addEventListener("change", () => {
-      els.modelSearch.value = "";
+      els.modelSelect.value = "";
       clearAppliedModel();
-      renderModelList("");
+      renderModelList();
       previewModelMatches();
     });
 
-    els.modelSearch.addEventListener("input", () => {
-      const applied = getAppliedModel();
-      if (applied && els.modelSearch.value.trim() !== modelDisplayName(applied)) clearAppliedModel({ keepMessage: true });
-      previewModelMatches();
+    els.modelSelect.addEventListener("change", () => {
+      syncModelSelectionFromInput();
+      updateInputHints();
     });
-    els.modelSearch.addEventListener("change", () => { syncModelSelectionFromInput(); });
-    els.modelSearch.addEventListener("blur", () => { syncModelSelectionFromInput(); });
 
     [els.power, els.flow, els.pressure].forEach(input => {
       input.addEventListener("input", function () {
@@ -2126,7 +2118,7 @@
 
     /* ===== 初始化 ===== */
     renderBrandOptions();
-    renderModelList("");
+    renderModelList();
     updateModelStatus(getDefaultModelStatus());
     document.getElementById("catalogCountText").textContent = `${getBrands().length} 品牌 / ${WASHER_MODELS.length} 机型`;
 
