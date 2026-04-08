@@ -1,6 +1,7 @@
 name = "foam-feedback"
 main = "feedback-worker.js"
 compatibility_date = "2024-01-01"
+account_id = "9bd8bcd47b06909fc50d32a9ea3db133"
 
 # 非敏感配置可以放这里
 [vars]

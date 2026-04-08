@@ -1,114 +1,136 @@
 /**
- * Foam Cannon Feedback Proxy Worker
+ * Foam Cannon Calculator — Feedback Worker
  *
- * 极简代理：接收前端反馈 → 分类标注 → 调用 GitHub repository_dispatch → 触发 Actions 创建 Issue
- * Token 存在 Cloudflare 环境变量（Secret）中，前端永远不会接触到。
+ * 接收前端反馈 POST 请求，通过 GitHub API 创建 Issue。
+ * 环境变量:
+ *   GITHUB_REPO    — "owner/repo" 格式
+ *   ALLOWED_ORIGIN — 允许跨域的前端域名
+ *   GITHUB_TOKEN   — (secret) GitHub Fine-grained PAT
  */
-
-// 反馈分类 → GitHub labels 映射
-const CATEGORY_LABELS = {
-  // errata 类
-  "wrong-data":      { label: "数据有误",   emoji: "❌", ghLabels: ["feedback", "errata", "wrong-data"] },
-  "missing-model":   { label: "缺少机型",   emoji: "➕", ghLabels: ["feedback", "errata", "new-model"] },
-  "discontinued":    { label: "停产换代",   emoji: "🔄", ghLabels: ["feedback", "errata", "discontinued"] },
-  // suggestion 类
-  "feature":         { label: "功能需求",   emoji: "🚀", ghLabels: ["feedback", "suggestion", "feature"] },
-  "ui":              { label: "界面体验",   emoji: "🎨", ghLabels: ["feedback", "suggestion", "ui"] },
-  "calculation":     { label: "计算逻辑",   emoji: "🔢", ghLabels: ["feedback", "suggestion", "calculation"] },
-  "data":            { label: "数据相关",   emoji: "📊", ghLabels: ["feedback", "suggestion", "data-request"] },
-  "other":           { label: "其他",       emoji: "💬", ghLabels: ["feedback", "other"] },
-};
-
-function classifyFeedback(feedback) {
-  if (feedback.type === "errata") {
-    const key = feedback.errataType || "other";
-    const meta = CATEGORY_LABELS[key] || CATEGORY_LABELS["other"];
-    return { category: key, ...meta };
-  } else {
-    const key = feedback.category || "other";
-    const meta = CATEGORY_LABELS[key] || CATEGORY_LABELS["other"];
-    return { category: key, ...meta };
-  }
-}
 
 export default {
   async fetch(request, env) {
-    // CORS 预检
+    // ---- CORS 预检 ----
     if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders(env.ALLOWED_ORIGIN || "*"),
-      });
+      return handleCORS(env);
     }
 
-    // 只接受 POST /api/feedback
-    const url = new URL(request.url);
-    if (request.method !== "POST" || url.pathname !== "/api/feedback") {
-      return jsonResponse(404, { error: "Not Found" }, env.ALLOWED_ORIGIN);
+    // 只接受 POST
+    if (request.method !== "POST") {
+      return jsonResp({ error: "Method not allowed" }, 405, env);
+    }
+
+    // ---- 校验 Origin ----
+    const origin = request.headers.get("Origin") || "";
+    if (env.ALLOWED_ORIGIN && !origin.startsWith(env.ALLOWED_ORIGIN)) {
+      return jsonResp({ error: "Forbidden origin" }, 403, env);
     }
 
     try {
       const body = await request.json();
+      const { type } = body; // "errata" | "suggestion"
 
-      // 基本校验
-      if (!body.type || !["errata", "suggestion"].includes(body.type)) {
-        return jsonResponse(400, { error: "Invalid feedback type" }, env.ALLOWED_ORIGIN);
+      if (type === "errata") {
+        return await handleErrata(body, env);
+      } else if (type === "suggestion") {
+        return await handleSuggestion(body, env);
+      } else {
+        return jsonResp({ error: 'Invalid type, expected "errata" or "suggestion"' }, 400, env);
       }
-
-      // 分类标注
-      const classification = classifyFeedback(body);
-
-      // 调用 GitHub repository_dispatch
-      const ghRes = await fetch(
-        `https://api.github.com/repos/${env.GITHUB_REPO}/dispatches`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${env.GITHUB_TOKEN}`,
-            Accept: "application/vnd.github+json",
-            "User-Agent": "foam-feedback-worker",
-            "X-GitHub-Api-Version": "2022-11-28",
-          },
-          body: JSON.stringify({
-            event_type: "user-feedback",
-            client_payload: {
-              feedback: body,
-              classification: classification,
-              submitted_at: new Date().toISOString(),
-            },
-          }),
-        }
-      );
-
-      if (ghRes.status === 204) {
-        return jsonResponse(200, { ok: true, message: "反馈已提交，感谢！" }, env.ALLOWED_ORIGIN);
-      }
-
-      const ghErr = await ghRes.text();
-      console.error("GitHub API error:", ghRes.status, ghErr);
-      return jsonResponse(502, { error: "提交失败，请稍后重试" }, env.ALLOWED_ORIGIN);
-    } catch (e) {
-      console.error("Worker error:", e);
-      return jsonResponse(500, { error: "服务器内部错误" }, env.ALLOWED_ORIGIN);
+    } catch (err) {
+      return jsonResp({ error: "Bad request: " + err.message }, 400, env);
     }
   },
 };
 
-function corsHeaders(origin) {
+// ========== 处理勘误 / 新机型 ==========
+async function handleErrata(body, env) {
+  const { brand, model, power, flow, pressure, nozzleType, notes, subType } = body;
+
+  if (!brand && !model && !notes) {
+    return jsonResp({ error: "At least brand/model or notes required" }, 400, env);
+  }
+
+  const label = subType === "new" ? "new-model" : "errata";
+  const emoji = subType === "new" ? "🆕" : "🔧";
+  const title = `${emoji} [${label}] ${brand || "?"} ${model || "?"}`;
+
+  const lines = [
+    `### ${subType === "new" ? "新机型提交" : "数据勘误"}`,
+    "",
+    `| 字段 | 值 |`,
+    `|------|------|`,
+    `| 品牌 | ${brand || "-"} |`,
+    `| 型号 | ${model || "-"} |`,
+    `| 功率 (W) | ${power || "-"} |`,
+    `| 流量 (L/min) | ${flow || "-"} |`,
+    `| 压力 (MPa) | ${pressure || "-"} |`,
+    `| 喷嘴类型 | ${nozzleType || "-"} |`,
+    "",
+    `**备注:** ${notes || "无"}`,
+  ];
+
+  return await createIssue(title, lines.join("\n"), [label, "feedback"], env);
+}
+
+// ========== 处理建议 ==========
+async function handleSuggestion(body, env) {
+  const { content } = body;
+  if (!content || !content.trim()) {
+    return jsonResp({ error: "Content is required" }, 400, env);
+  }
+
+  const title = `💡 [suggestion] ${content.slice(0, 60)}${content.length > 60 ? "..." : ""}`;
+  const mdBody = `### 用户建议\n\n${content}`;
+
+  return await createIssue(title, mdBody, ["suggestion", "feedback"], env);
+}
+
+// ========== 调用 GitHub API 创建 Issue ==========
+async function createIssue(title, body, labels, env) {
+  const url = `https://api.github.com/repos/${env.GITHUB_REPO}/issues`;
+
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.GITHUB_TOKEN}`,
+      Accept: "application/vnd.github+json",
+      "User-Agent": "foam-feedback-worker",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ title, body, labels }),
+  });
+
+  if (!resp.ok) {
+    const detail = await resp.text();
+    console.error("GitHub API error:", resp.status, detail);
+    return jsonResp({ error: "Failed to create issue", status: resp.status }, 502, env);
+  }
+
+  const issue = await resp.json();
+  return jsonResp({ ok: true, issue_url: issue.html_url, issue_number: issue.number }, 201, env);
+}
+
+// ========== 工具函数 ==========
+function corsHeaders(env) {
   return {
-    "Access-Control-Allow-Origin": origin || "*",
+    "Access-Control-Allow-Origin": env.ALLOWED_ORIGIN || "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Max-Age": "86400",
   };
 }
 
-function jsonResponse(status, data, origin) {
+function handleCORS(env) {
+  return new Response(null, { status: 204, headers: corsHeaders(env) });
+}
+
+function jsonResp(data, status, env) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       "Content-Type": "application/json",
-      ...corsHeaders(origin),
+      ...corsHeaders(env),
     },
   });
 }

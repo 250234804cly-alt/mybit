@@ -1448,12 +1448,13 @@
         </div>
 
         <div class="feedback-actions">
+          <button class="btn-feedback" id="fbSubmitBtn">🚀 直接提交</button>
           <button class="btn-copy-feedback" id="fbCopyBtn">📋 复制到剪贴板</button>
         </div>
 
         <div class="feedback-success" id="fbSuccess">
-          ✅ 已复制到剪贴板！<br/>
-          <span style="color:var(--muted);font-size:12px;">请粘贴发送到相关群聊或反馈渠道，感谢你的贡献 🙏</span>
+          <span id="fbSuccessMsg">✅ 已复制到剪贴板！</span><br/>
+          <span id="fbSuccessHint" style="color:var(--muted);font-size:12px;">请粘贴发送到相关群聊或反馈渠道，感谢你的贡献 🙏</span>
         </div>
       </div>
     </div>
@@ -2205,7 +2206,12 @@
       const typeTabs = document.querySelectorAll(".feedback-type-tab");
       const panels = document.querySelectorAll(".feedback-panel");
       const copyBtn = document.getElementById("fbCopyBtn");
+      const submitBtn = document.getElementById("fbSubmitBtn");
       const successEl = document.getElementById("fbSuccess");
+      const successMsg = document.getElementById("fbSuccessMsg");
+      const successHint = document.getElementById("fbSuccessHint");
+
+      const FEEDBACK_API = "https://foam-feedback.250234804cly.workers.dev";
 
       // 折叠 / 展开
       toggle.addEventListener("click", () => {
@@ -2300,8 +2306,7 @@
         const text = buildFeedbackText();
         try {
           await navigator.clipboard.writeText(text);
-          successEl.classList.add("show");
-          setTimeout(() => successEl.classList.remove("show"), 4000);
+          showSuccess("✅ 已复制到剪贴板！", "请粘贴发送到相关群聊或反馈渠道，感谢你的贡献 🙏");
         } catch (e) {
           // fallback
           const ta = document.createElement("textarea");
@@ -2312,10 +2317,84 @@
           ta.select();
           document.execCommand("copy");
           document.body.removeChild(ta);
-          successEl.classList.add("show");
-          setTimeout(() => successEl.classList.remove("show"), 4000);
+          showSuccess("✅ 已复制到剪贴板！", "请粘贴发送到相关群聊或反馈渠道，感谢你的贡献 🙏");
         }
       });
+
+      // 直接提交到 Worker
+      submitBtn.addEventListener("click", async () => {
+        const v = validateFeedback();
+        if (!v.ok) {
+          alert(v.msg);
+          return;
+        }
+        const type = getActiveType();
+        let payload;
+
+        if (type === "errata") {
+          const errataType = document.getElementById("fbErrataType").value;
+          payload = {
+            type: "errata",
+            subType: errataType === "new_model" ? "new" : "correction",
+            brand: document.getElementById("fbBrand").value.trim(),
+            model: document.getElementById("fbModel").value.trim(),
+            power: document.getElementById("fbPower").value.trim(),
+            flow: document.getElementById("fbFlow").value.trim(),
+            pressure: document.getElementById("fbPressure").value.trim(),
+            nozzleType: "",
+            notes: document.getElementById("fbErrataNote").value.trim(),
+          };
+        } else {
+          payload = {
+            type: "suggestion",
+            content: document.getElementById("fbSuggestionText").value.trim(),
+          };
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "⏳ 提交中...";
+
+        try {
+          const resp = await fetch(FEEDBACK_API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await resp.json();
+
+          if (resp.ok && data.ok) {
+            showSuccess(
+              "✅ 提交成功！",
+              `感谢你的贡献 🙏 <a href="${data.issue_url}" target="_blank" rel="noopener" style="color:var(--cyan);text-decoration:underline;">查看反馈 #${data.issue_number}</a>`
+            );
+            // 清空表单
+            if (type === "errata") {
+              document.getElementById("fbBrand").value = "";
+              document.getElementById("fbModel").value = "";
+              document.getElementById("fbPower").value = "";
+              document.getElementById("fbFlow").value = "";
+              document.getElementById("fbPressure").value = "";
+              document.getElementById("fbErrataNote").value = "";
+            } else {
+              document.getElementById("fbSuggestionText").value = "";
+            }
+          } else {
+            alert("提交失败：" + (data.error || "服务端错误，请稍后重试"));
+          }
+        } catch (err) {
+          alert("网络错误，请检查网络连接后重试");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "🚀 直接提交";
+        }
+      });
+
+      function showSuccess(msg, hint) {
+        successMsg.innerHTML = msg;
+        successHint.innerHTML = hint;
+        successEl.classList.add("show");
+        setTimeout(() => successEl.classList.remove("show"), 5000);
+      }
     })();
   </script>
 </body>
