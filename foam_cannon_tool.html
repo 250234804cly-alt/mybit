@@ -1447,12 +1447,12 @@
         </div>
 
         <div class="feedback-actions">
-          <button class="btn-copy-feedback" id="fbCopyBtn">📋 复制到剪贴板</button>
+          <button class="btn-feedback" id="fbSubmitBtn">🚀 提交反馈</button>
         </div>
 
         <div class="feedback-success" id="fbSuccess">
-          ✅ 已复制到剪贴板！<br/>
-          <span style="color:var(--muted);font-size:12px;">请粘贴发送到相关群聊或反馈渠道，感谢你的贡献 🙏</span>
+          ✅ 反馈已提交！<br/>
+          <span style="color:var(--muted);font-size:12px;">我们会尽快处理，感谢你的贡献 🙏</span>
         </div>
       </div>
     </div>
@@ -2208,11 +2208,14 @@
 
     /* ===== 建议 & 勘误逻辑 ===== */
     (() => {
+      // ⚠️ 部署 Worker 后确认这个地址与你的 workers.dev 子域名一致
+      const FEEDBACK_API = "https://foam-feedback.chenjunyu.workers.dev/api/feedback";
+
       const toggle = document.getElementById("feedbackToggle");
       const body = document.getElementById("feedbackBody");
       const typeTabs = document.querySelectorAll(".feedback-type-tab");
       const panels = document.querySelectorAll(".feedback-panel");
-      const copyBtn = document.getElementById("fbCopyBtn");
+      const submitBtn = document.getElementById("fbSubmitBtn");
       const successEl = document.getElementById("fbSuccess");
 
       // 折叠 / 展开
@@ -2269,59 +2272,78 @@
         }
       }
 
-      // 生成反馈文本
-      function buildFeedbackText() {
+      // 收集表单数据（结构化 JSON，不暴露任何后端细节）
+      function collectFeedbackData() {
         const type = getActiveType();
-        const lines = [];
-        lines.push("===== PA壶喷芯估算台 — 反馈 =====");
-        lines.push("");
         if (type === "errata") {
-          const errataType = document.getElementById("fbErrataType").value;
-          lines.push("【类型】" + (errataType === "correction" ? "参数纠错" : "新增机型"));
-          lines.push("【品牌】" + document.getElementById("fbBrand").value.trim());
-          lines.push("【型号】" + document.getElementById("fbModel").value.trim());
-          lines.push("【功率】" + document.getElementById("fbPower").value.trim() + " W");
-          lines.push("【流量】" + document.getElementById("fbFlow").value.trim() + " L/h");
-          const pressure = document.getElementById("fbPressure").value.trim();
-          if (pressure) lines.push("【压力】" + pressure + " bar");
-          const note = document.getElementById("fbErrataNote").value.trim();
-          if (note) {
-            lines.push("【说明】" + note);
-          }
+          return {
+            type: "errata",
+            errataType: document.getElementById("fbErrataType").value,
+            brand: document.getElementById("fbBrand").value.trim(),
+            model: document.getElementById("fbModel").value.trim(),
+            power: document.getElementById("fbPower").value.trim(),
+            flow: document.getElementById("fbFlow").value.trim(),
+            pressure: document.getElementById("fbPressure").value.trim() || null,
+            note: document.getElementById("fbErrataNote").value.trim() || null
+          };
         } else {
-          lines.push("【类型】应用建议");
-          lines.push("【内容】");
-          lines.push(document.getElementById("fbSuggestionText").value.trim());
+          return {
+            type: "suggestion",
+            content: document.getElementById("fbSuggestionText").value.trim()
+          };
         }
-        lines.push("");
-        lines.push("====================================");
-        return lines.join("\n");
       }
 
-      // 复制到剪贴板
-      copyBtn.addEventListener("click", async () => {
+      // 简易防抖：防止重复提交
+      let submitting = false;
+
+      // 提交反馈
+      submitBtn.addEventListener("click", async () => {
+        if (submitting) return;
         const v = validateFeedback();
         if (!v.ok) {
           alert(v.msg);
           return;
         }
-        const text = buildFeedbackText();
+
+        submitting = true;
+        const origText = submitBtn.textContent;
+        submitBtn.textContent = "⏳ 提交中...";
+        submitBtn.disabled = true;
+
         try {
-          await navigator.clipboard.writeText(text);
+          const res = await fetch(FEEDBACK_API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(collectFeedbackData())
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || "提交失败 (" + res.status + ")");
+          }
+
           successEl.classList.add("show");
-          setTimeout(() => successEl.classList.remove("show"), 4000);
+          setTimeout(() => successEl.classList.remove("show"), 5000);
+
+          // 提交成功后清空表单
+          const type = getActiveType();
+          if (type === "errata") {
+            document.getElementById("fbBrand").value = "";
+            document.getElementById("fbModel").value = "";
+            document.getElementById("fbPower").value = "";
+            document.getElementById("fbFlow").value = "";
+            document.getElementById("fbPressure").value = "";
+            document.getElementById("fbErrataNote").value = "";
+          } else {
+            document.getElementById("fbSuggestionText").value = "";
+          }
         } catch (e) {
-          // fallback
-          const ta = document.createElement("textarea");
-          ta.value = text;
-          ta.style.position = "fixed";
-          ta.style.left = "-9999px";
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand("copy");
-          document.body.removeChild(ta);
-          successEl.classList.add("show");
-          setTimeout(() => successEl.classList.remove("show"), 4000);
+          alert("提交失败：" + e.message + "\n\n如反复失败，请稍后再试。");
+        } finally {
+          submitting = false;
+          submitBtn.textContent = origText;
+          submitBtn.disabled = false;
         }
       });
     })();
