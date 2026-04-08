@@ -11,60 +11,84 @@ jobs:
       issues: write
 
     steps:
-      - name: Parse feedback and create issue
+      - name: Parse feedback and create structured issue
         uses: actions/github-script@v7
         with:
           script: |
             const payload = context.payload.client_payload;
             const feedback = payload.feedback;
+            const classification = payload.classification || {};
             const submittedAt = payload.submitted_at || new Date().toISOString();
 
-            let title, body, labels;
+            // 从 Worker 预计算的分类信息中取 labels，兜底用 feedback type
+            const labels = classification.ghLabels || ['feedback', feedback.type];
+            const categoryLabel = classification.label || feedback.type;
+            const categoryEmoji = classification.emoji || '📝';
+
+            let title, body;
 
             if (feedback.type === 'errata') {
-              // 纠错 / 新增机型
-              const errataTypeMap = {
-                'wrong-data': '数据有误',
-                'missing-model': '缺少机型',
-                'other': '其他'
-              };
-              const errataLabel = errataTypeMap[feedback.errataType] || feedback.errataType;
-
-              title = `[数据反馈] ${errataLabel}：${feedback.brand} ${feedback.model}`;
-              labels = ['feedback', 'errata'];
+              // ──────────────────────────────────
+              //  数据反馈 Issue 模板
+              // ──────────────────────────────────
+              title = `[${categoryEmoji} ${categoryLabel}] ${feedback.brand} ${feedback.model}`;
 
               body = [
-                `## 📋 数据反馈`,
+                `## ${categoryEmoji} 数据反馈 — ${categoryLabel}`,
+                ``,
+                `### 📋 机型信息`,
                 ``,
                 `| 字段 | 内容 |`,
-                `|------|------|`,
-                `| **反馈类型** | ${errataLabel} |`,
+                `|:-----|:-----|`,
                 `| **品牌** | ${feedback.brand} |`,
                 `| **型号** | ${feedback.model} |`,
-                `| **额定功率 (W)** | ${feedback.power} |`,
-                `| **额定流量 (L/min)** | ${feedback.flow} |`,
-                feedback.pressure ? `| **额定压力 (bar)** | ${feedback.pressure} |` : null,
+                `| **额定功率** | ${feedback.power} W |`,
+                `| **额定流量** | ${feedback.flow} L/h |`,
+                feedback.pressure ? `| **额定压力** | ${feedback.pressure} bar |` : null,
+                `| **反馈类型** | ${categoryEmoji} ${categoryLabel} |`,
                 ``,
-                feedback.note ? `### 备注\n${feedback.note}` : null,
+                `### 📝 处理清单`,
                 ``,
+                `- [ ] 核实数据来源`,
+                feedback.errataType === 'wrong-data'
+                  ? `- [ ] 更正 \`machines\` 数据中 ${feedback.brand} ${feedback.model} 的参数`
+                  : feedback.errataType === 'missing-model'
+                  ? `- [ ] 将 ${feedback.brand} ${feedback.model} 添加到 \`machines\` 数据`
+                  : feedback.errataType === 'discontinued'
+                  ? `- [ ] 标记 ${feedback.brand} ${feedback.model} 为停产，确认替代型号`
+                  : `- [ ] 根据反馈内容处理`,
+                `- [ ] 更新页面并测试`,
+                ``,
+                feedback.note ? `### 💬 补充说明\n\n> ${feedback.note.replace(/\n/g, '\n> ')}\n` : null,
                 `---`,
-                `🕐 提交时间：${submittedAt}`,
-                `📌 来源：PA 泡沫壶喷芯计算器用户反馈`
+                ``,
+                `<sub>🕐 ${submittedAt} · 📌 PA 泡沫壶喷芯计算器 · 用户反馈自动创建</sub>`
               ].filter(Boolean).join('\n');
 
             } else if (feedback.type === 'suggestion') {
-              // 应用建议
-              title = `[建议] ${feedback.content.slice(0, 50)}${feedback.content.length > 50 ? '...' : ''}`;
-              labels = ['feedback', 'suggestion'];
+              // ──────────────────────────────────
+              //  建议 Issue 模板
+              // ──────────────────────────────────
+              const preview = feedback.content.slice(0, 40);
+              const ellipsis = feedback.content.length > 40 ? '...' : '';
+              title = `[${categoryEmoji} ${categoryLabel}] ${preview}${ellipsis}`;
 
               body = [
-                `## 💡 用户建议`,
+                `## ${categoryEmoji} 用户建议 — ${categoryLabel}`,
+                ``,
+                `### 💡 建议内容`,
                 ``,
                 feedback.content,
                 ``,
+                `### 📝 处理清单`,
+                ``,
+                `- [ ] 评估可行性`,
+                `- [ ] 确定优先级`,
+                `- [ ] 实现 & 测试`,
+                ``,
                 `---`,
-                `🕐 提交时间：${submittedAt}`,
-                `📌 来源：PA 泡沫壶喷芯计算器用户反馈`
+                ``,
+                `<sub>🕐 ${submittedAt} · 📌 PA 泡沫壶喷芯计算器 · 用户反馈自动创建</sub>`
               ].join('\n');
 
             } else {

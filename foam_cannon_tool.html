@@ -1424,8 +1424,10 @@
               <label>
                 <span>类型</span>
                 <select id="fbErrataType">
-                  <option value="correction">参数纠错</option>
-                  <option value="new_model">新增机型</option>
+                  <option value="wrong-data">❌ 参数有误</option>
+                  <option value="missing-model">➕ 缺少机型</option>
+                  <option value="discontinued">🔄 已停产/换代</option>
+                  <option value="other">💬 其他</option>
                 </select>
               </label>
             </div>
@@ -1439,6 +1441,16 @@
         <!-- 应用建议 面板 -->
         <div class="feedback-panel" id="fbPanelSuggestion">
           <div class="input-group">
+            <label>
+              <span>建议分类</span>
+              <select id="fbSuggestionCategory">
+                <option value="feature">🚀 功能需求</option>
+                <option value="ui">🎨 界面体验</option>
+                <option value="calculation">🔢 计算逻辑</option>
+                <option value="data">📊 数据相关</option>
+                <option value="other">💬 其他</option>
+              </select>
+            </label>
             <label>
               <span class="feedback-required">你的建议</span>
               <textarea class="feedback-textarea" id="fbSuggestionText" rows="5" placeholder="对这个工具有啥想法都可以说——功能、交互、计算逻辑、新需求……"></textarea>
@@ -2289,6 +2301,7 @@
         } else {
           return {
             type: "suggestion",
+            category: document.getElementById("fbSuggestionCategory").value,
             content: document.getElementById("fbSuggestionText").value.trim()
           };
         }
