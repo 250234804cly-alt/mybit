@@ -1,0 +1,12 @@
+name = "foam-feedback"
+main = "feedback-worker.js"
+compatibility_date = "2024-01-01"
+
+# 非敏感配置可以放这里
+[vars]
+GITHUB_REPO = "250234804cly-alt/mybit"
+ALLOWED_ORIGIN = "https://junyuchen.cn"
+
+# ⚠️ GITHUB_TOKEN 必须通过 wrangler secret 设置，绝不要写在这个文件里！
+# 部署后运行：wrangler secret put GITHUB_TOKEN
+# 然后粘贴你的 GitHub Fine-grained PAT
