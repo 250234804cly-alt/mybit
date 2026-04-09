@@ -765,11 +765,11 @@
       justify-content: center;
       gap: 8px;
       padding: 14px 20px;
-      border: 1px dashed rgba(113,240,255,0.25);
+      border: 1px solid rgba(113,240,255,0.25);
       border-radius: var(--radius);
       background: rgba(113,240,255,0.04);
       color: var(--muted);
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -938,6 +938,52 @@
       padding: 12px 18px 0;
     }
 
+    /* ===== 作者信息 ===== */
+    .author-section {
+      margin: 10px auto 0;
+      padding: 12px 18px 16px;
+      max-width: 420px;
+      text-align: center;
+    }
+    .author-section .author-title {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+    .author-cards {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .author-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .author-card .qr-img {
+      width: 110px;
+      height: 110px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .author-card .platform-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .author-card .platform-id {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'SF Mono', 'Menlo', monospace;
+    }
+
     /* ===== 分割线 ===== */
     .sep { margin: 16px 0; }
 
@@ -1062,7 +1108,7 @@
         justify-content: center;
       }
       .feedback-textarea {
-        min-height: 120px;
+        min-height: 80px;
         font-size: 16px; /* 防止 iOS 缩放 */
         padding: 16px;
       }
@@ -1164,7 +1210,7 @@
     <!-- ===== 头部 ===== -->
     <div class="header">
       <div class="eyebrow">PA FOAM · NOZZLE CALC</div>
-      <h1>PA 壶喷芯估算台</h1>
+      <h1>PA壶喷芯估算</h1>
       <p>选洗车机型号或手动填参数，一键算出推荐喷芯大小。</p>
     </div>
 
@@ -2339,6 +2385,11 @@
           successEl.classList.add("show");
           setTimeout(() => successEl.classList.remove("show"), 5000);
 
+          // 📊 埋点：反馈提交成功
+          if (window.__foamTrack) {
+            window.__foamTrack("feedback_submit", { feedback_type: getActiveType() });
+          }
+
           // 提交成功后清空表单
           const type = getActiveType();
           if (type === "errata") {
@@ -2360,6 +2411,103 @@
         }
       });
     })();
+
+    /* ===== 📊 前端埋点模块 ===== */
+    (function initAnalytics() {
+      const TRACK_API = "https://foam-feedback.chenjunyu.workers.dev/api/track";
+      const PAGE_ID = "tool";
+
+      function track(event, props) {
+        const payload = { event, page: PAGE_ID };
+        if (props) payload.props = props;
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(TRACK_API, JSON.stringify(payload));
+        } else {
+          fetch(TRACK_API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            keepalive: true,
+          }).catch(() => {});
+        }
+      }
+
+      // 1) 页面加载
+      track("page_view");
+
+      // 2) 计算按钮
+      const calcBtn = document.getElementById("calcBtn");
+      const mobileCalcBtn = document.getElementById("mobileCalcBtn");
+
+      function trackCalculation() {
+        const brand = document.getElementById("brandFilterSelect");
+        const modelInput = document.getElementById("modelSearchInput");
+        const props = {};
+        if (brand && brand.value && brand.value !== "all") props.brand = brand.value;
+        if (modelInput && modelInput.dataset.appliedId) props.model = modelInput.dataset.appliedId;
+        const isBrandMode = document.getElementById("panelBrand").classList.contains("active");
+        props.mode = isBrandMode ? "brand" : "custom";
+        track("calculate", props);
+      }
+
+      if (calcBtn) calcBtn.addEventListener("click", trackCalculation);
+      if (mobileCalcBtn) mobileCalcBtn.addEventListener("click", trackCalculation);
+
+      // 3) 型号选择（模糊搜索确认时）
+      const modelInput = document.getElementById("modelSearchInput");
+      if (modelInput) {
+        modelInput.addEventListener("change", () => {
+          if (modelInput.dataset.appliedId) {
+            const brand = document.getElementById("brandFilterSelect");
+            track("select_model", {
+              brand: brand ? brand.value : "",
+              model: modelInput.dataset.appliedId,
+            });
+          }
+        });
+      }
+
+      // 4) 折叠详情
+      const detailToggle = document.getElementById("detailToggle");
+      if (detailToggle) {
+        detailToggle.addEventListener("click", () => {
+          track("detail_toggle");
+        });
+      }
+
+      // 5) 型号库"算"按钮
+      const catalogContent = document.getElementById("catalogContent");
+      if (catalogContent) {
+        catalogContent.addEventListener("click", (e) => {
+          const btn = e.target.closest(".catalog-card-action");
+          if (btn && btn.dataset.modelId) {
+            track("catalog_use", { model_id: btn.dataset.modelId });
+          }
+        });
+      }
+
+      // 6) 暴露 track
+      window.__foamTrack = track;
+    })();
   </script>
+  <!-- ===== 作者信息 ===== -->
+  <div class="author-section">
+    <div class="author-title">— 关注作者 —</div>
+    <div class="author-cards">
+      <div class="author-card">
+        <img class="qr-img" src="images/douyin-qr.png" alt="抖音二维码" />
+        <span class="platform-label">🎵 抖音</span>
+        <span class="platform-id">ID: 1778914525</span>
+      </div>
+      <div class="author-card">
+        <img class="qr-img" src="images/xiaohongshu-qr.png" alt="小红书二维码" />
+        <span class="platform-label">📕 小红书</span>
+        <span class="platform-id">ID: 336972953</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cloudflare Web Analytics -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CF_ANALYTICS_TOKEN"}'></script>
 </body>
 </html>

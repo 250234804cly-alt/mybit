@@ -14,7 +14,7 @@
   <link rel="canonical" href="https://junyuchen.cn/foam-cannon-calculator" />
 
   <!-- Open Graph -->
-  <meta property="og:title" content="PA 壶喷芯估算台 — 一键计算泡沫壶推荐喷芯尺寸" />
+  <meta property="og:title" content="PA壶喷芯估算 — 一键计算泡沫壶推荐喷芯尺寸" />
   <meta property="og:description" content="选洗车机型号或手动填参数，一键算出推荐喷芯大小。支持 30+ 主流机型，精准匹配最佳喷芯。" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://junyuchen.cn/foam-cannon-calculator" />
@@ -23,7 +23,7 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="PA 壶喷芯估算台" />
+  <meta name="twitter:title" content="PA壶喷芯估算" />
   <meta name="twitter:description" content="选洗车机型号或手动填参数，一键算出推荐喷芯大小。" />
 
   <!-- 主题色 -->
@@ -765,11 +765,11 @@
       justify-content: center;
       gap: 8px;
       padding: 14px 20px;
-      border: 1px dashed rgba(113,240,255,0.25);
+      border: 1px solid rgba(113,240,255,0.25);
       border-radius: var(--radius);
       background: rgba(113,240,255,0.04);
       color: var(--muted);
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -847,7 +847,7 @@
 
     .feedback-textarea {
       width: 100%;
-      min-height: 100px;
+      min-height: 72px;
       border: 1px solid rgba(255,255,255,0.12);
       background: rgba(255,255,255,0.04);
       color: var(--text);
@@ -899,23 +899,6 @@
       filter: none;
     }
 
-    .btn-copy-feedback {
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-      cursor: pointer;
-      border-radius: 14px;
-      padding: 14px 18px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .btn-copy-feedback:hover {
-      transform: translateY(-1px);
-      border-color: rgba(113,240,255,0.3);
-    }
-
     .feedback-success {
       display: none;
       text-align: center;
@@ -935,7 +918,53 @@
       font-size: 12px;
       line-height: 1.7;
       text-align: center;
-      padding: 12px 18px 0;
+      padding: 8px 18px 0;
+    }
+
+    /* ===== 作者信息 ===== */
+    .author-section {
+      margin: 10px auto 0;
+      padding: 12px 18px 16px;
+      max-width: 420px;
+      text-align: center;
+    }
+    .author-section .author-title {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+    .author-cards {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .author-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .author-card .qr-img {
+      width: 110px;
+      height: 110px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .author-card .platform-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .author-card .platform-id {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'SF Mono', 'Menlo', monospace;
     }
 
     /* ===== 分割线 ===== */
@@ -1062,7 +1091,7 @@
         justify-content: center;
       }
       .feedback-textarea {
-        min-height: 120px;
+        min-height: 80px;
         font-size: 16px; /* 防止 iOS 缩放 */
         padding: 16px;
       }
@@ -1074,7 +1103,7 @@
       }
 
       /* 按钮触摸尺寸 */
-      .btn-primary, .btn-secondary, .btn-feedback, .btn-copy-feedback {
+      .btn-primary, .btn-secondary, .btn-feedback {
         min-height: 52px;
         border-radius: 14px;
       }
@@ -1085,8 +1114,7 @@
         filter: brightness(0.94);
       }
       .btn-secondary:active,
-      .btn-feedback:active,
-      .btn-copy-feedback:active {
+      .btn-feedback:active {
         transform: scale(0.97);
       }
 
@@ -1134,6 +1162,10 @@
       .actions.original-actions {
         display: none;
       }
+      /* 底部留出空间，避免悬浮按钮遮挡二维码 */
+      body {
+        padding-bottom: 80px;
+      }
     }
     @media (min-width: 601px) {
       .mobile-sticky-calc { display: none; }
@@ -1164,7 +1196,7 @@
     <!-- ===== 头部 ===== -->
     <div class="header">
       <div class="eyebrow">PA FOAM · NOZZLE CALC</div>
-      <h1>PA 壶喷芯估算台</h1>
+      <h1>PA壶喷芯估算</h1>
       <p>选洗车机型号或手动填参数，一键算出推荐喷芯大小。</p>
     </div>
 
@@ -1449,12 +1481,11 @@
 
         <div class="feedback-actions">
           <button class="btn-feedback" id="fbSubmitBtn">🚀 直接提交</button>
-          <button class="btn-copy-feedback" id="fbCopyBtn">📋 复制到剪贴板</button>
         </div>
 
         <div class="feedback-success" id="fbSuccess">
-          <span id="fbSuccessMsg">✅ 已复制到剪贴板！</span><br/>
-          <span id="fbSuccessHint" style="color:var(--muted);font-size:12px;">请粘贴发送到相关群聊或反馈渠道，感谢你的贡献 🙏</span>
+          <span id="fbSuccessMsg">✅ 提交成功！</span><br/>
+          <span id="fbSuccessHint" style="color:var(--muted);font-size:12px;">感谢你的贡献 🙏</span>
         </div>
       </div>
     </div>
@@ -2205,13 +2236,12 @@
       const body = document.getElementById("feedbackBody");
       const typeTabs = document.querySelectorAll(".feedback-type-tab");
       const panels = document.querySelectorAll(".feedback-panel");
-      const copyBtn = document.getElementById("fbCopyBtn");
       const submitBtn = document.getElementById("fbSubmitBtn");
       const successEl = document.getElementById("fbSuccess");
       const successMsg = document.getElementById("fbSuccessMsg");
       const successHint = document.getElementById("fbSuccessHint");
 
-      const FEEDBACK_API = "https://foam-feedback.250234804cly.workers.dev";
+      const FEEDBACK_API = "https://foam-feedback.chenjunyu.workers.dev/api/feedback";
 
       // 折叠 / 展开
       toggle.addEventListener("click", () => {
@@ -2267,60 +2297,6 @@
         }
       }
 
-      // 生成反馈文本
-      function buildFeedbackText() {
-        const type = getActiveType();
-        const lines = [];
-        lines.push("===== PA壶喷芯估算台 — 反馈 =====");
-        lines.push("");
-        if (type === "errata") {
-          const errataType = document.getElementById("fbErrataType").value;
-          lines.push("【类型】" + (errataType === "correction" ? "参数纠错" : "新增机型"));
-          lines.push("【品牌】" + document.getElementById("fbBrand").value.trim());
-          lines.push("【型号】" + document.getElementById("fbModel").value.trim());
-          lines.push("【功率】" + document.getElementById("fbPower").value.trim() + " W");
-          lines.push("【流量】" + document.getElementById("fbFlow").value.trim() + " L/h");
-          const pressure = document.getElementById("fbPressure").value.trim();
-          if (pressure) lines.push("【压力】" + pressure + " bar");
-          const note = document.getElementById("fbErrataNote").value.trim();
-          if (note) {
-            lines.push("【说明】" + note);
-          }
-        } else {
-          lines.push("【类型】应用建议");
-          lines.push("【内容】");
-          lines.push(document.getElementById("fbSuggestionText").value.trim());
-        }
-        lines.push("");
-        lines.push("====================================");
-        return lines.join("\n");
-      }
-
-      // 复制到剪贴板
-      copyBtn.addEventListener("click", async () => {
-        const v = validateFeedback();
-        if (!v.ok) {
-          alert(v.msg);
-          return;
-        }
-        const text = buildFeedbackText();
-        try {
-          await navigator.clipboard.writeText(text);
-          showSuccess("✅ 已复制到剪贴板！", "请粘贴发送到相关群聊或反馈渠道，感谢你的贡献 🙏");
-        } catch (e) {
-          // fallback
-          const ta = document.createElement("textarea");
-          ta.value = text;
-          ta.style.position = "fixed";
-          ta.style.left = "-9999px";
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand("copy");
-          document.body.removeChild(ta);
-          showSuccess("✅ 已复制到剪贴板！", "请粘贴发送到相关群聊或反馈渠道，感谢你的贡献 🙏");
-        }
-      });
-
       // 直接提交到 Worker
       submitBtn.addEventListener("click", async () => {
         const v = validateFeedback();
@@ -2367,6 +2343,10 @@
               "✅ 提交成功！",
               `感谢你的贡献 🙏 <a href="${data.issue_url}" target="_blank" rel="noopener" style="color:var(--cyan);text-decoration:underline;">查看反馈 #${data.issue_number}</a>`
             );
+            // 📊 埋点：反馈提交成功
+            if (window.__foamTrack) {
+              window.__foamTrack("feedback_submit", { feedback_type: type });
+            }
             // 清空表单
             if (type === "errata") {
               document.getElementById("fbBrand").value = "";
@@ -2396,6 +2376,102 @@
         setTimeout(() => successEl.classList.remove("show"), 5000);
       }
     })();
+
+    /* ===== 📊 前端埋点模块 ===== */
+    (function initAnalytics() {
+      const TRACK_API = "https://foam-feedback.chenjunyu.workers.dev/api/track";
+      const PAGE_ID = "index";
+
+      function track(event, props) {
+        const payload = { event, page: PAGE_ID };
+        if (props) payload.props = props;
+        // 用 sendBeacon 避免阻塞，不影响用户体验
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(TRACK_API, JSON.stringify(payload));
+        } else {
+          fetch(TRACK_API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            keepalive: true,
+          }).catch(() => {}); // 静默失败，不影响主功能
+        }
+      }
+
+      // 1) 页面加载
+      track("page_view");
+
+      // 2) 计算按钮 — 拦截 calcBtn 和 mobileCalcBtn
+      const calcBtn = document.getElementById("calcBtn");
+      const mobileCalcBtn = document.getElementById("mobileCalcBtn");
+
+      function trackCalculation() {
+        const brand = document.getElementById("brandFilter");
+        const model = document.getElementById("modelSelect");
+        const props = {};
+        if (brand && brand.value) props.brand = brand.value;
+        if (model && model.value) props.model = model.value;
+        const isBrandMode = document.getElementById("panelBrand").classList.contains("active");
+        props.mode = isBrandMode ? "brand" : "custom";
+        track("calculate", props);
+      }
+
+      if (calcBtn) calcBtn.addEventListener("click", trackCalculation);
+      if (mobileCalcBtn) mobileCalcBtn.addEventListener("click", trackCalculation);
+
+      // 3) 型号选择
+      const brandFilter = document.getElementById("brandFilter");
+      const modelSelect = document.getElementById("modelSelect");
+      if (modelSelect) {
+        modelSelect.addEventListener("change", () => {
+          if (modelSelect.value) {
+            const brand = brandFilter ? brandFilter.value : "";
+            track("select_model", { brand, model: modelSelect.value });
+          }
+        });
+      }
+
+      // 4) 折叠详情
+      const detailToggle = document.getElementById("detailToggle");
+      if (detailToggle) {
+        detailToggle.addEventListener("click", () => {
+          track("detail_toggle");
+        });
+      }
+
+      // 5) 型号库"算"按钮 — 事件代理
+      const catalogContent = document.getElementById("catalogContent");
+      if (catalogContent) {
+        catalogContent.addEventListener("click", (e) => {
+          const btn = e.target.closest(".catalog-card-action");
+          if (btn && btn.dataset.modelId) {
+            track("catalog_use", { model_id: btn.dataset.modelId });
+          }
+        });
+      }
+
+      // 6) 暴露 track 给反馈模块使用
+      window.__foamTrack = track;
+    })();
   </script>
+  <!-- ===== 作者信息 ===== -->
+  <div class="author-section">
+    <div class="author-title">— 关注作者 —</div>
+    <div class="author-cards">
+      <div class="author-card">
+        <img class="qr-img" src="images/douyin-qr.png" alt="抖音二维码" />
+        <span class="platform-label">🎵 抖音</span>
+        <span class="platform-id">ID: 1778914525</span>
+      </div>
+      <div class="author-card">
+        <img class="qr-img" src="images/xiaohongshu-qr.png" alt="小红书二维码" />
+        <span class="platform-label">📕 小红书</span>
+        <span class="platform-id">ID: 336972953</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cloudflare Web Analytics -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CF_ANALYTICS_TOKEN"}'></script>
 </body>
 </html>
