@@ -8,12 +8,13 @@ account_id = "9bd8bcd47b06909fc50d32a9ea3db133"
 GITHUB_REPO = "250234804cly-alt/mybit"
 ALLOWED_ORIGIN = "https://junyuchen.cn"
 
-# KV namespace 绑定（需先在 Cloudflare Dashboard 创建，或用 wrangler kv:namespace create）
-# 创建命令：wrangler kv:namespace create "ANALYTICS"
-# 创建后把返回的 id 填到下面
-[[kv_namespaces]]
-binding = "ANALYTICS"
-id = "YOUR_KV_NAMESPACE_ID"
+# KV namespace 绑定（暂未创建，先注释避免部署报错）
+# 需要启用埋点统计时：
+#   1. wrangler kv:namespace create "ANALYTICS"
+#   2. 把返回的 id 填到下面，取消注释
+# [[kv_namespaces]]
+# binding = "ANALYTICS"
+# id = "YOUR_KV_NAMESPACE_ID"
 
 # ⚠️ Secrets 必须通过 wrangler secret 设置，绝不要写在这个文件里！
 # 部署步骤：
