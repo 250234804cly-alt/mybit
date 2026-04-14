@@ -33,6 +33,9 @@
   <!-- Favicon: 内联 SVG，无需额外文件 -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2371f0ff'/%3E%3Cstop offset='100%25' stop-color='%2300a9c2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='%2307131a' stroke='url(%23g)' stroke-width='4'/%3E%3Ctext x='50' y='66' text-anchor='middle' font-size='48' font-family='system-ui' fill='url(%23g)'%3E⚡%3C/text%3E%3C/svg%3E" />
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2307131a'/%3E%3Ctext x='90' y='120' text-anchor='middle' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
   <style>
     @import url("https://fonts.loli.net/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@400;500;700;900&display=swap");
 
@@ -760,15 +763,22 @@
     /* ===== 反馈入口 ===== */
     .feedback-toggle {
       width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 14px 20px;
-      border: 1px solid rgba(113,240,255,0.25);
-      border-radius: var(--radius);
+      padding: 16px 24px;
+      border: 2px solid rgba(113,240,255,0.25);
+      border-radius: 18px;
       background: rgba(113,240,255,0.04);
       color: var(--muted);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
       font-size: 15px;
       font-weight: 500;
       cursor: pointer;
@@ -943,6 +953,7 @@
     .share-btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
       padding: 8px 16px;
       border: 1px solid rgba(255,255,255,0.1);
@@ -983,6 +994,73 @@
       border-radius: 4px;
       object-fit: cover;
     }
+    #shareResultImage {
+      background: rgba(113,240,255,0.08);
+      border-color: rgba(113,240,255,0.3);
+      color: var(--cyan);
+      font-weight: 700;
+    }
+    #shareResultImage:hover {
+      background: rgba(113,240,255,0.16);
+      border-color: rgba(113,240,255,0.5);
+    }
+
+    /* ===== 分享英雄按钮（醒目版） ===== */
+    .share-hero {
+      margin: 24px auto 8px;
+      padding: 0 18px;
+      max-width: 420px;
+    }
+    .share-hero-btn {
+      width: 100%;
+      padding: 16px 24px !important;
+      border-radius: 18px !important;
+      font-size: 17px !important;
+      font-weight: 800 !important;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, rgba(113,240,255,0.15), rgba(95,230,150,0.12)) !important;
+      border: 2px solid rgba(113,240,255,0.35) !important;
+      color: #e0f7ff !important;
+      box-shadow:
+        0 4px 20px rgba(113,240,255,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      transition: all 0.25s ease !important;
+      position: relative;
+      overflow: hidden;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      z-index: 10;
+    }
+    .share-hero-btn::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(113,240,255,0.08) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .share-hero-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow:
+        0 8px 30px rgba(113,240,255,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+      border-color: rgba(113,240,255,0.6) !important;
+      background: linear-gradient(135deg, rgba(113,240,255,0.22), rgba(95,230,150,0.18)) !important;
+    }
+    .share-hero-btn:hover::before { opacity: 1; }
+    .share-hero-btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 10px rgba(113,240,255,0.2);
+    }
+    .share-hero-btn .share-icon {
+      font-size: 22px !important;
+    }
+
+    /* 手机端分享英雄按钮 */
     .share-toast {
       display: none;
       margin-top: 10px;
@@ -1157,9 +1235,10 @@
 
       /* 反馈面板 */
       .feedback-toggle {
-        padding: 16px;
+        padding: 16px 24px;
         min-height: 52px;
-        font-size: 13px;
+        font-size: 14px;
+        border-radius: 18px;
       }
       .feedback-type-tabs { gap: 6px; }
       .feedback-type-tab {
@@ -1183,7 +1262,7 @@
       }
 
       /* 按钮触摸尺寸 */
-      .btn-primary, .btn-secondary, .btn-feedback {
+      .btn-primary, .btn-secondary, .btn-feedback, .share-hero-btn {
         min-height: 52px;
         border-radius: 14px;
       }
@@ -1511,10 +1590,22 @@
       结论别迷信到小数点后两位：真车真壶真药水，最后还得实喷。这个小工具的价值，是帮你别在明显不合适的喷芯上浪费时间。
     </p>
 
+    <!-- ===== 分享功能（前置，更醒目） ===== -->
+    <div class="share-section share-hero">
+      <button class="share-btn share-hero-btn" id="shareResultImage" title="生成结果分享图"
+              onclick="if(window.generateShareImage)window.generateShareImage();else alert('请稍候...')">
+        <span class="share-icon">📸</span>
+        生成分享图
+      </button>
+      <div class="share-toast" id="shareToast">⚠️ 请先计算结果，再分享哦！</div>
+    </div>
+
     <!-- ===== 建议 & 勘误入口 ===== -->
-    <button class="feedback-toggle" id="feedbackToggle">
-      <span>📝 建议 &amp; 勘误</span>
-    </button>
+    <div class="share-section" style="margin-top: 8px;">
+      <button class="feedback-toggle" id="feedbackToggle">
+        <span>📝 建议 &amp; 勘误</span>
+      </button>
+    </div>
     <div class="feedback-body" id="feedbackBody">
       <div class="card">
         <div class="feedback-type-tabs">
@@ -2688,42 +2779,671 @@
     })();
   </script>
 
-  <!-- ===== 分享功能 ===== -->
-  <div class="share-section">
-    <div class="share-buttons">
-      <button class="share-btn" id="shareCopyLink" title="复制链接">
-        <span class="share-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-        复制链接，分享给朋友
-      </button>
-    </div>
-    <div class="share-toast" id="shareToast">✅ 链接已复制，快去分享吧！</div>
-  </div>
-
-  <!-- ===== 分享 JS ===== -->
+  <!-- ===== 分享 JS（已移至分享按钮上方） ===== -->
   <script>
   (() => {
-    const SHARE_URL = "https://junyuchen.cn";
-    document.getElementById("shareCopyLink").addEventListener("click", () => {
-      const toast = document.getElementById("shareToast");
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(SHARE_URL).then(() => showToast(toast));
-      } else {
-        const ta = document.createElement("textarea");
-        ta.value = SHARE_URL;
-        ta.style.cssText = "position:fixed;opacity:0;";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-        showToast(toast);
-      }
-    });
     function showToast(el) {
       if (!el) return;
       el.classList.remove("show");
       void el.offsetWidth;
       el.classList.add("show");
       setTimeout(() => el.classList.remove("show"), 2200);
+    }
+    window.__shareToast = showToast;
+  })();
+  </script>
+
+  <!-- ===== QR Code 生成器（轻量，纯 Canvas） ===== -->
+  <script>
+  /**
+   * 极简 QR Code 编码器 — 仅 Byte mode, L 纠错, version 自动选取 (1~6)
+   * 参考 ISO/IEC 18004, 足够编码 ~60 字符的 URL
+   * 输出: 二维 boolean 矩阵 (true = 黑点)
+   */
+  var QRCodeGen = (() => {
+    "use strict";
+
+    /* GF(256) 算术 */
+    const EXP = new Uint8Array(256), LOG = new Uint8Array(256);
+    { let v = 1; for (let i = 0; i < 255; i++) { EXP[i] = v; LOG[v] = i; v = (v << 1) ^ (v >= 128 ? 0x11d : 0); } EXP[255] = EXP[0]; }
+
+    function gfMul(a, b) { return a === 0 || b === 0 ? 0 : EXP[(LOG[a] + LOG[b]) % 255]; }
+
+    /* RS 编码 */
+    function rsGenPoly(n) {
+      let g = [1];
+      for (let i = 0; i < n; i++) {
+        const ng = new Uint8Array(g.length + 1);
+        for (let j = 0; j < g.length; j++) {
+          ng[j] ^= g[j];
+          ng[j + 1] ^= gfMul(g[j], EXP[i]);
+        }
+        g = ng;
+      }
+      return g;
+    }
+    function rsEncode(data, ecLen) {
+      const gen = rsGenPoly(ecLen);
+      const r = new Uint8Array(ecLen);
+      for (let i = 0; i < data.length; i++) {
+        const f = r[0] ^ data[i];
+        r.copyWithin(0, 1); r[ecLen - 1] = 0;
+        for (let j = 0; j < ecLen; j++) r[j] ^= gfMul(gen[j + 1], f);
+      }
+      return r;
+    }
+
+    /* 版本参数表 (L 纠错) — [totalCodewords, ecPerBlock, numBlocks, dataBytes] */
+    const VER = [
+      null,
+      [26, 7, 1, 19],   // v1
+      [44, 10, 1, 34],   // v2
+      [70, 15, 1, 55],   // v3
+      [100, 20, 1, 80],  // v4
+      [134, 26, 1, 108], // v5
+      [172, 18, 2, 136], // v6
+    ];
+
+    /* 获取最小可用版本 */
+    function pickVersion(byteLen) {
+      for (let v = 1; v <= 6; v++) {
+        const cap = VER[v][3] - 2; // 减去 mode indicator + char count
+        if (byteLen <= cap) return v;
+      }
+      throw new Error("QR data too long (max ~134 bytes)");
+    }
+
+    /* 生成比特流 */
+    function buildBits(data, ver) {
+      const totalData = VER[ver][3];
+      const bits = [];
+      const push = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >> i) & 1); };
+
+      // Mode: Byte (0100)
+      push(0b0100, 4);
+      // Char count (v1-9 = 8bit)
+      push(data.length, 8);
+      // Data
+      for (const b of data) push(b, 8);
+      // Terminator
+      const dataBits = totalData * 8;
+      const termLen = Math.min(4, dataBits - bits.length);
+      push(0, termLen);
+      // Pad to byte
+      while (bits.length % 8 !== 0) bits.push(0);
+      // Pad bytes
+      let pad = 0;
+      while (bits.length < dataBits) {
+        push(pad === 0 ? 0xEC : 0x11, 8);
+        pad ^= 1;
+      }
+      // To bytes
+      const bytes = new Uint8Array(totalData);
+      for (let i = 0; i < totalData; i++) {
+        let v = 0;
+        for (let b = 0; b < 8; b++) v = (v << 1) | (bits[i * 8 + b] || 0);
+        bytes[i] = v;
+      }
+      return bytes;
+    }
+
+    /* 交织 + EC */
+    function interleave(codewords, ver) {
+      const [total, ecPer, numBlk, dataTotal] = VER[ver];
+      const dataPer = Math.floor(dataTotal / numBlk);
+      const blocks = [];
+      let offset = 0;
+      for (let b = 0; b < numBlk; b++) {
+        const len = dataPer + (b < dataTotal % numBlk ? 1 : 0);
+        blocks.push(codewords.slice(offset, offset + len));
+        offset += len;
+      }
+      // EC
+      const ecBlocks = blocks.map(blk => rsEncode(blk, ecPer));
+      // Interleave data
+      const result = [];
+      const maxData = Math.max(...blocks.map(b => b.length));
+      for (let i = 0; i < maxData; i++)
+        for (const blk of blocks) if (i < blk.length) result.push(blk[i]);
+      // Interleave EC
+      for (let i = 0; i < ecPer; i++)
+        for (const blk of ecBlocks) if (i < blk.length) result.push(blk[i]);
+      return new Uint8Array(result);
+    }
+
+    /* 模块放置 */
+    function placeModules(stream, ver) {
+      const size = ver * 4 + 17;
+      const M = Array.from({ length: size }, () => new Int8Array(size)); // 0=white, 1=black, -1=unset
+      const R = Array.from({ length: size }, () => new Uint8Array(size)); // reserved
+
+      function setMod(r, c, val) { if (r >= 0 && r < size && c >= 0 && c < size) { M[r][c] = val ? 1 : 0; R[r][c] = 1; } }
+
+      // Finder patterns
+      function finder(row, col) {
+        for (let dr = -1; dr <= 7; dr++)
+          for (let dc = -1; dc <= 7; dc++) {
+            const r = row + dr, c = col + dc;
+            if (r < 0 || r >= size || c < 0 || c >= size) continue;
+            const inOuter = dr >= 0 && dr <= 6 && dc >= 0 && dc <= 6;
+            const inInner = dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4;
+            const onBorder = dr === 0 || dr === 6 || dc === 0 || dc === 6;
+            setMod(r, c, inInner || (inOuter && onBorder) ? 1 : 0);
+          }
+      }
+      finder(0, 0);
+      finder(0, size - 7);
+      finder(size - 7, 0);
+
+      // Timing
+      for (let i = 8; i < size - 8; i++) {
+        setMod(6, i, i % 2 === 0 ? 1 : 0);
+        setMod(i, 6, i % 2 === 0 ? 1 : 0);
+      }
+
+      // Dark module
+      setMod(size - 8, 8, 1);
+
+      // Reserve format info areas
+      for (let i = 0; i < 8; i++) {
+        setMod(8, i, 0); setMod(8, size - 1 - i, 0);
+        setMod(i, 8, 0); setMod(size - 1 - i, 8, 0);
+      }
+      setMod(8, 8, 0);
+
+      // Place data bits
+      const bits = [];
+      for (const b of stream) for (let i = 7; i >= 0; i--) bits.push((b >> i) & 1);
+
+      let bitIdx = 0;
+      let upward = true;
+      for (let col = size - 1; col >= 0; col -= 2) {
+        if (col === 6) col = 5; // skip timing
+        const rows = upward ? Array.from({ length: size }, (_, i) => size - 1 - i) : Array.from({ length: size }, (_, i) => i);
+        for (const row of rows) {
+          for (const dc of [0, -1]) {
+            const c = col + dc;
+            if (c < 0 || c >= size) continue;
+            if (R[row][c]) continue;
+            M[row][c] = bitIdx < bits.length ? bits[bitIdx++] : 0;
+          }
+        }
+        upward = !upward;
+      }
+
+      // Apply mask 0 (checkerboard: (r+c)%2 == 0)
+      for (let r = 0; r < size; r++)
+        for (let c = 0; c < size; c++)
+          if (!R[r][c] && (r + c) % 2 === 0) M[r][c] ^= 1;
+
+      // Write format info (L ecl, mask 0 => 0b111011111000100 = 0x77C4)
+      const fmtBits = 0b111011111000100;
+      const fmtPositions = [
+        // around top-left finder
+        [8, 0], [8, 1], [8, 2], [8, 3], [8, 4], [8, 5], [8, 7], [8, 8],
+        [7, 8], [5, 8], [4, 8], [3, 8], [2, 8], [1, 8], [0, 8],
+      ];
+      const fmtPositions2 = [];
+      for (let i = 0; i < 7; i++) fmtPositions2.push([size - 1 - i, 8]);
+      for (let i = 0; i < 8; i++) fmtPositions2.push([8, size - 8 + i]);
+
+      for (let i = 0; i < 15; i++) {
+        const bit = (fmtBits >> (14 - i)) & 1;
+        const [r1, c1] = fmtPositions[i];
+        M[r1][c1] = bit;
+        if (i < fmtPositions2.length) {
+          const [r2, c2] = fmtPositions2[i];
+          M[r2][c2] = bit;
+        }
+      }
+
+      return M;
+    }
+
+    /* 公开 API */
+    function generate(text) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text);
+      const ver = pickVersion(data.length);
+      const codewords = buildBits(data, ver);
+      const stream = interleave(codewords, ver);
+      const matrix = placeModules(stream, ver);
+      return { matrix, size: ver * 4 + 17, version: ver };
+    }
+
+    /**
+     * 在 Canvas 上绘制 QR Code
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {number} x - 左上角 x
+     * @param {number} y - 左上角 y
+     * @param {number} pixelSize - QR 码总尺寸(px)
+     * @param {string} text - 要编码的文本
+     * @param {string} fgColor - 前景色
+     * @param {string} bgColor - 背景色
+     */
+    function drawOnCanvas(ctx, x, y, pixelSize, text, fgColor, bgColor) {
+      const { matrix, size } = generate(text);
+      const quiet = 2; // 静区
+      const totalMods = size + quiet * 2;
+      const modPx = pixelSize / totalMods;
+
+      // 背景
+      ctx.fillStyle = bgColor || "#ffffff";
+      ctx.fillRect(x, y, pixelSize, pixelSize);
+
+      // 模块
+      ctx.fillStyle = fgColor || "#000000";
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (matrix[r][c]) {
+            ctx.fillRect(
+              x + (c + quiet) * modPx,
+              y + (r + quiet) * modPx,
+              Math.ceil(modPx),
+              Math.ceil(modPx)
+            );
+          }
+        }
+      }
+    }
+
+    return { generate, drawOnCanvas };
+  })();
+  </script>
+
+  <!-- ===== 分享结果图生成 ===== -->
+  <script>
+  (() => {
+    /* 收集当前计算结果数据 */
+    function getResultData() {
+      const resultArea = document.getElementById("resultArea");
+      const expArea = document.getElementById("expResultArea");
+      const notRecArea = document.getElementById("notRecommendedArea");
+
+      // 正常计算结果
+      if (resultArea.classList.contains("show")) {
+        return {
+          type: "calc",
+          nozzleSize: document.getElementById("closestSize")?.textContent || "—",
+          rangeMin: document.getElementById("rangeMinText")?.textContent || "—",
+          rangeMax: document.getElementById("rangeMaxText")?.textContent || "—",
+          nominal: document.getElementById("nominalText")?.textContent || "—",
+          minMm: document.getElementById("diameterMin")?.textContent || "—",
+          maxMm: document.getElementById("diameterMax")?.textContent || "—",
+          consistency: document.getElementById("consistencyBadge")?.textContent || "",
+          consistencyLevel: document.getElementById("consistencyBadge")?.className.includes("good") ? "good"
+            : document.getElementById("consistencyBadge")?.className.includes("warn") ? "warn" : "danger",
+          model: getAppliedModel(),
+          spec: getInputState().spec
+        };
+      }
+
+      // 经验值结果
+      if (expArea && expArea.style.display !== "none" && expArea.style.display !== "") {
+        return {
+          type: "exp",
+          nozzleSize: document.getElementById("expNozzle")?.textContent || "—",
+          basis: document.getElementById("expBasis")?.textContent || "—",
+          model: getAppliedModel(),
+          spec: getInputState().spec
+        };
+      }
+
+      return null;
+    }
+
+    /* 绘制圆角矩形 */
+    function roundRect(ctx, x, y, w, h, r) {
+      r = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    /* 主绘图函数 */
+    function generateShareImage() {
+      const data = getResultData();
+      if (!data) {
+        const toast = document.getElementById("shareToast");
+        toast.textContent = "⚠️ 请先计算结果，再分享哦！";
+        toast.style.background = "rgba(255,180,60,0.18)";
+        toast.style.color = "#ffb43c";
+        if (window.__shareToast) window.__shareToast(toast);
+        else { toast.classList.remove("show"); void toast.offsetWidth; toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 2200); }
+        setTimeout(() => { toast.style.background = ""; toast.style.color = ""; }, 2500);
+        return;
+      }
+
+      const W = 750, H = 1334;
+      const canvas = document.createElement("canvas");
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d");
+
+      // ===== 背景 =====
+      const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+      bgGrad.addColorStop(0, "#03080c");
+      bgGrad.addColorStop(0.42, "#07131a");
+      bgGrad.addColorStop(1, "#0a2029");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 光晕装饰
+      const glow1 = ctx.createRadialGradient(90, 140, 0, 90, 140, 200);
+      glow1.addColorStop(0, "rgba(0, 186, 255, 0.22)");
+      glow1.addColorStop(1, "transparent");
+      ctx.fillStyle = glow1;
+      ctx.fillRect(0, 0, W, H);
+
+      const glow2 = ctx.createRadialGradient(660, 130, 0, 660, 130, 150);
+      glow2.addColorStop(0, "rgba(206, 255, 123, 0.14)");
+      glow2.addColorStop(1, "transparent");
+      ctx.fillStyle = glow2;
+      ctx.fillRect(0, 0, W, H);
+
+      const glow3 = ctx.createRadialGradient(375, 1200, 0, 375, 1200, 300);
+      glow3.addColorStop(0, "rgba(0, 169, 194, 0.2)");
+      glow3.addColorStop(1, "transparent");
+      ctx.fillStyle = glow3;
+      ctx.fillRect(0, 0, W, H);
+
+      // 网格
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.025)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 24) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = 0; y < H; y += 24) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+
+      // ===== 顶部标签 =====
+      ctx.font = "500 22px 'Noto Sans SC', sans-serif";
+      ctx.fillStyle = "#71f0ff";
+      ctx.textAlign = "center";
+      ctx.fillText("PA FOAM · NOZZLE CALC", W / 2, 60);
+
+      // ===== 标题 =====
+      ctx.font = "900 68px 'Bebas Neue', sans-serif";
+      const titleGrad = ctx.createLinearGradient(120, 80, W - 120, 130);
+      titleGrad.addColorStop(0, "#71f0ff");
+      titleGrad.addColorStop(1, "#ceff7b");
+      ctx.fillStyle = titleGrad;
+      ctx.fillText("PA壶喷芯估算", W / 2, 128);
+
+      // ===== 机型信息 =====
+      const modelLine = data.model
+        ? `${data.model.brand} ${data.model.model} · ${data.model.powerWatts}W / ${data.model.flowRateLpm}L/min / ${data.model.pressureBar}bar`
+        : (data.spec ? `${data.spec.powerWatts || "?"}W / ${data.spec.flowRateLpm || "?"}L/min / ${data.spec.pressureBar || "?"}bar` : "");
+      
+      if (modelLine) {
+        ctx.font = "500 24px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "#88aeb7";
+        ctx.fillText(modelLine, W / 2, 172);
+      }
+
+      // ===== 分割线 =====
+      ctx.strokeStyle = "rgba(113, 240, 255, 0.2)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(80, 200);
+      ctx.lineTo(W - 80, 200);
+      ctx.stroke();
+
+      if (data.type === "calc") {
+        drawCalcResult(ctx, W, H, canvas, data);
+      } else if (data.type === "exp") {
+        drawExpResult(ctx, W, H, canvas, data);
+      }
+
+      // ===== 导出（由 reExport 处理，等二维码图片加载后触发） =====
+      // reExport 函数定义
+      if (typeof reExport === "undefined") {
+        window.__shareReExport = function(canvas) {
+          canvas.toBlob(async (blob) => {
+            if (!blob) return;
+            const file = new File([blob], "pa-nozzle-result.png", { type: "image/png" });
+            try {
+              if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({ title: "PA壶喷芯估算结果", text: `推荐喷芯，快来看看！`, url: "https://junyuchen.cn", files: [file] });
+                if (window.__foamTrack) window.__foamTrack("share_image", { method: "web_share_api" });
+                return;
+              }
+            } catch (e) { if (e.name !== "AbortError") console.warn("share failed:", e); }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url; a.download = "pa-nozzle-result.png"; a.click();
+            URL.revokeObjectURL(url);
+            if (window.__foamTrack) window.__foamTrack("share_image", { method: "download" });
+          }, "image/png");
+        };
+      }
+    }
+
+    /* 绘制正常计算结果 */
+    function drawCalcResult(ctx, W, H, canvas, data) {
+      // ===== 推荐标签 =====
+      ctx.font = "700 24px 'Noto Sans SC', sans-serif";
+      ctx.fillStyle = "#88aeb7";
+      ctx.textAlign = "center";
+      ctx.fillText("推 荐 喷 芯", W / 2, 280);
+
+      // ===== 推荐喷芯 大字 =====
+      ctx.font = "900 140px 'Bebas Neue', sans-serif";
+      const nozzleGrad = ctx.createLinearGradient(180, 300, W - 180, 440);
+      nozzleGrad.addColorStop(0, "#71f0ff");
+      nozzleGrad.addColorStop(1, "#ceff7b");
+      ctx.fillStyle = nozzleGrad;
+      ctx.fillText(data.nozzleSize, W / 2, 400);
+
+      // mm 单位
+      ctx.font = "900 48px 'Bebas Neue', sans-serif";
+      ctx.fillStyle = "#88aeb7";
+      ctx.fillText("mm", W / 2 + 180, 400);
+
+      // ===== 合理区间 =====
+      ctx.font = "500 26px 'Noto Sans SC', sans-serif";
+      ctx.fillStyle = "#ecfbff";
+      ctx.fillText(`合理区间 ${data.rangeMin} ~ ${data.rangeMax} mm`, W / 2, 470);
+
+      // ===== 三张数据卡 =====
+      const cards = [
+        { label: "合理下限", value: data.minMm, desc: "偏浓泡" },
+        { label: "标称推荐", value: data.nominal, desc: "最稳" },
+        { label: "合理上限", value: data.maxMm, desc: "更轻松" }
+      ];
+
+      const cardW = 190, cardH = 130, cardY = 520, gap = 18;
+      const totalW = cards.length * cardW + (cards.length - 1) * gap;
+      const startX = (W - totalW) / 2;
+
+      cards.forEach((card, i) => {
+        const cx = startX + i * (cardW + gap);
+        roundRect(ctx, cx, cardY, cardW, cardH, 20);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.font = "500 18px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "#88aeb7";
+        ctx.textAlign = "center";
+        ctx.fillText(card.label, cx + cardW / 2, cardY + 32);
+
+        ctx.font = "900 44px 'Bebas Neue', sans-serif";
+        ctx.fillStyle = "#ecfbff";
+        ctx.fillText(card.value, cx + cardW / 2, cardY + 85);
+
+        ctx.font = "400 16px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "#88aeb7";
+        ctx.fillText(card.desc, cx + cardW / 2, cardY + 115);
+      });
+
+      // ===== 一致性徽章 =====
+      const badgeY = 700;
+      const badgeColors = {
+        good: { bg: "rgba(206, 255, 123, 0.12)", border: "rgba(206, 255, 123, 0.3)", text: "#ceff7b" },
+        warn: { bg: "rgba(255, 211, 107, 0.12)", border: "rgba(255, 211, 107, 0.3)", text: "#ffd36b" },
+        danger: { bg: "rgba(255, 133, 112, 0.12)", border: "rgba(255, 133, 112, 0.3)", text: "#ff8570" }
+      };
+      const bc = badgeColors[data.consistencyLevel] || badgeColors.warn;
+      const badgeText = data.consistency;
+      ctx.font = "700 22px 'Noto Sans SC', sans-serif";
+      const badgeW = ctx.measureText(badgeText).width + 40;
+      const badgeX = (W - badgeW) / 2;
+      roundRect(ctx, badgeX, badgeY, badgeW, 42, 21);
+      ctx.fillStyle = bc.bg;
+      ctx.fill();
+      ctx.strokeStyle = bc.border;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = bc.text;
+      ctx.textAlign = "center";
+      ctx.fillText(badgeText, W / 2, badgeY + 28);
+
+      // ===== 区间条 =====
+      const barY = 780, barH = 14, barX = 80, barW = W - 160;
+      roundRect(ctx, barX, barY, barW, barH, 7);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.fill();
+
+      // 填充区间
+      const libMin = 1.1, libMax = 2.0;
+      const rMin = parseFloat(data.rangeMin) || libMin;
+      const rMax = parseFloat(data.rangeMax) || libMax;
+      const leftPct = Math.max(0, (rMin - libMin) / (libMax - libMin));
+      const widthPct = Math.max(0.06, (rMax - rMin) / (libMax - libMin));
+      const fillX = barX + leftPct * barW;
+      const fillW = widthPct * barW;
+
+      roundRect(ctx, fillX, barY, fillW, barH, 7);
+      const fillGrad = ctx.createLinearGradient(fillX, barY, fillX + fillW, barY);
+      fillGrad.addColorStop(0, "#71f0ff");
+      fillGrad.addColorStop(1, "#ceff7b");
+      ctx.fillStyle = fillGrad;
+      ctx.fill();
+
+      // 区间标注
+      ctx.font = "400 18px 'Noto Sans SC', sans-serif";
+      ctx.fillStyle = "#88aeb7";
+      ctx.textAlign = "left";
+      ctx.fillText("1.10", barX, barY + 36);
+      ctx.textAlign = "right";
+      ctx.fillText("2.00 mm", barX + barW, barY + 36);
+      ctx.textAlign = "center";
+      ctx.fillText(`推荐 ${data.rangeMin} ~ ${data.rangeMax} mm`, W / 2, barY + 36);
+
+      // ===== 底部二维码区域 =====
+      const qrSize = 180;
+      const qrX = W / 2;
+      const qrY = H - 310;
+
+      // 扫码提示文字（在二维码上方）
+      ctx.textAlign = "center";
+      ctx.font = "600 22px 'Noto Sans SC', sans-serif";
+      ctx.fillStyle = "#ecfbff";
+      ctx.fillText("扫码试试你的", qrX, qrY - 10);
+      ctx.fillText("洗车机推荐喷芯", qrX, qrY + 20);
+
+      // 二维码（使用预生成的图片，更可靠）
+      const qrImg = new Image();
+      qrImg.crossOrigin = "anonymous";
+      qrImg.onload = () => {
+        ctx.drawImage(qrImg, qrX - qrSize / 2, qrY + 38, qrSize, qrSize);
+        ctx.font = "500 20px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "#88aeb7";
+        ctx.fillText("junyuchen.cn", qrX, qrY + qrSize + 68);
+        window.__shareReExport(canvas);
+      };
+      qrImg.onerror = () => {
+        QRCodeGen.drawOnCanvas(ctx, qrX - qrSize / 2, qrY + 38, qrSize,
+          "https://junyuchen.cn", "#c8e8f0", "#0a1820");
+        ctx.font = "500 20px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "#88aeb7";
+        ctx.fillText("junyuchen.cn", qrX, qrY + qrSize + 68);
+        window.__shareReExport(canvas);
+      };
+      qrImg.src = "images/site-qr.png";
+      return; // 导出由 reExport 处理
+    }
+
+    /* 绘制经验值结果 */
+    function drawExpResult(ctx, W, H, canvas, data) {
+      // ===== 标签 =====
+      ctx.font = "700 24px 'Noto Sans SC', sans-serif";
+      ctx.fillStyle = "#88aeb7";
+      ctx.textAlign = "center";
+      ctx.fillText("经 验 推 荐 喷 芯", W / 2, 280);
+
+      // ===== 大字 =====
+      ctx.font = "900 120px 'Bebas Neue', sans-serif";
+      const nozzleGrad = ctx.createLinearGradient(180, 300, W - 180, 440);
+      nozzleGrad.addColorStop(0, "#71f0ff");
+      nozzleGrad.addColorStop(1, "#ceff7b");
+      ctx.fillStyle = nozzleGrad;
+      ctx.fillText(data.nozzleSize, W / 2, 410);
+
+      // ===== 依据 =====
+      ctx.font = "500 28px 'Noto Sans SC', sans-serif";
+      ctx.fillStyle = "#ecfbff";
+      ctx.fillText(`基于 ${data.basis} 的经验值`, W / 2, 480);
+
+      // ===== 提示 =====
+      const tips = [
+        "💡 补充流量和压力可获得更精确的计算结果",
+        "📋 经验值仅供参考，实际效果还受药液、发泡网影响"
+      ];
+      tips.forEach((tip, i) => {
+        ctx.font = "400 22px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "#88aeb7";
+        ctx.fillText(tip, W / 2, 570 + i * 40);
+      });
+
+      // ===== 底部二维码区域 =====
+      const qrSize = 180;
+      const qrX = W / 2;
+      const qrY = H - 310;
+
+      ctx.textAlign = "center";
+      ctx.font = "600 22px 'Noto Sans SC', sans-serif";
+      ctx.fillStyle = "#ecfbff";
+      ctx.fillText("扫码试试你的", qrX, qrY - 10);
+      ctx.fillText("洗车机推荐喷芯", qrX, qrY + 20);
+
+      // 二维码（使用预生成图片）
+      const qrImg2 = new Image();
+      qrImg2.crossOrigin = "anonymous";
+      qrImg2.onload = () => {
+        ctx.drawImage(qrImg2, qrX - qrSize / 2, qrY + 38, qrSize, qrSize);
+        ctx.font = "500 20px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "#88aeb7";
+        ctx.fillText("junyuchen.cn", qrX, qrY + qrSize + 68);
+        window.__shareReExport(canvas);
+      };
+      qrImg2.onerror = () => {
+        QRCodeGen.drawOnCanvas(ctx, qrX - qrSize / 2, qrY + 38, qrSize,
+          "https://junyuchen.cn", "#c8e8f0", "#0a1820");
+        ctx.font = "500 20px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "#88aeb7";
+        ctx.fillText("junyuchen.cn", qrX, qrY + qrSize + 68);
+        window.__shareReExport(canvas);
+      };
+      qrImg2.src = "images/site-qr.png";
+      return;
+    }
+
+    /* ===== 事件绑定 ===== */
+    // 底部分享区入口
+    window.generateShareImage = generateShareImage;
+    const shareBtn = document.getElementById("shareResultImage");
+    if (shareBtn) {
+      shareBtn.addEventListener("click", generateShareImage);
     }
   })();
   </script>
@@ -2747,5 +3467,20 @@
 
   <!-- Cloudflare Web Analytics -->
   <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CF_ANALYTICS_TOKEN"}'></script>
+
+  <!-- PWA: Service Worker 注册 -->
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/foam-cannon-calculator/sw.js', { scope: '/foam-cannon-calculator/' })
+        .then((reg) => {
+          console.log('[SW] 注册成功，scope:', reg.scope);
+        })
+        .catch((err) => {
+          console.warn('[SW] 注册失败:', err);
+        });
+    });
+  }
+  </script>
 </body>
 </html>

@@ -2717,34 +2717,19 @@
 
   <!-- ===== 分享功能 ===== -->
   <div class="share-section">
+    <div class="share-title">分享给朋友</div>
     <div class="share-buttons">
-      <button class="share-btn" id="shareCopyLink" title="复制链接">
-        <span class="share-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-        复制链接，分享给朋友
+      <button class="share-btn" id="shareResultImage" title="生成结果分享图">
+        <span class="share-icon">📸</span>
+        生成结果图
       </button>
     </div>
-    <div class="share-toast" id="shareToast">✅ 链接已复制，快去分享吧！</div>
+    <div class="share-toast" id="shareToast">⚠️ 请先计算结果，再分享哦！</div>
   </div>
 
   <!-- ===== 分享 JS ===== -->
   <script>
   (() => {
-    const SHARE_URL = "https://junyuchen.cn";
-    document.getElementById("shareCopyLink").addEventListener("click", () => {
-      const toast = document.getElementById("shareToast");
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(SHARE_URL).then(() => showToast(toast));
-      } else {
-        const ta = document.createElement("textarea");
-        ta.value = SHARE_URL;
-        ta.style.cssText = "position:fixed;opacity:0;";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-        showToast(toast);
-      }
-    });
     function showToast(el) {
       if (!el) return;
       el.classList.remove("show");
@@ -2752,6 +2737,7 @@
       el.classList.add("show");
       setTimeout(() => el.classList.remove("show"), 2200);
     }
+    window.__shareToast = showToast;
   })();
   </script>
 
