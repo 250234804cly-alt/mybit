@@ -1060,6 +1060,47 @@
       font-size: 22px !important;
     }
 
+    /* ===== 分享预览浮层 ===== */
+    .share-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.88); backdrop-filter: blur(8px);
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 20px; animation: shareOverlayIn 0.25s ease;
+    }
+    .share-overlay.active { display: flex; }
+    @keyframes shareOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+    .share-overlay-img {
+      max-width: 82vw; max-height: 62vh; border-radius: 12px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5); object-fit: contain;
+    }
+    .share-overlay-actions {
+      display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: center;
+    }
+    .share-overlay-btn {
+      padding: 12px 28px; border: none; border-radius: 24px;
+      font-size: 16px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .share-overlay-btn:active { transform: scale(0.96); }
+    .share-overlay-btn.primary {
+      background: linear-gradient(135deg, #71f0ff, #ceff7b); color: #0a1820;
+      box-shadow: 0 4px 16px rgba(113,240,255,0.3);
+    }
+    .share-overlay-btn.secondary {
+      background: rgba(255,255,255,0.12); color: #ecfbff;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .share-overlay-close {
+      position: absolute; top: 16px; right: 20px; width: 40px; height: 40px;
+      border: none; background: rgba(255,255,255,0.1); border-radius: 50%;
+      color: #fff; font-size: 22px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .share-overlay-tip {
+      margin-top: 14px; font-size: 14px; color: #88aeb7; text-align: center;
+    }
+    .share-overlay-tip em { font-style: normal; color: #71f0ff; }
+
     /* 手机端分享英雄按钮 */
     .share-toast {
       display: none;
@@ -1598,6 +1639,14 @@
         生成分享图
       </button>
       <div class="share-toast" id="shareToast">⚠️ 请先计算结果，再分享哦！</div>
+    </div>
+
+    <!-- 分享预览浮层 -->
+    <div class="share-overlay" id="shareOverlay">
+      <button class="share-overlay-close" id="shareOverlayClose" aria-label="关闭">✕</button>
+      <img class="share-overlay-img" id="shareOverlayImg" alt="分享图预览" />
+      <div class="share-overlay-actions" id="shareOverlayActions"></div>
+      <div class="share-overlay-tip" id="shareOverlayTip"></div>
     </div>
 
     <!-- ===== 建议 & 勘误入口 ===== -->
@@ -3200,25 +3249,66 @@
         drawExpResult(ctx, W, H, canvas, data);
       }
 
-      // ===== 导出（由 reExport 处理，等二维码图片加载后触发） =====
-      // reExport 函数定义
+      // ===== 导出：弹出预览浮层 =====
       if (typeof reExport === "undefined") {
         window.__shareReExport = function(canvas) {
           canvas.toBlob(async (blob) => {
             if (!blob) return;
+            const blobUrl = URL.createObjectURL(blob);
+            const overlay = document.getElementById("shareOverlay");
+            const img = document.getElementById("shareOverlayImg");
+            const actions = document.getElementById("shareOverlayActions");
+            const tip = document.getElementById("shareOverlayTip");
+            img.src = blobUrl;
+            actions.innerHTML = "";
+
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
             const file = new File([blob], "pa-nozzle-result.png", { type: "image/png" });
-            try {
-              if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({ title: "PA壶喷芯估算结果", text: `推荐喷芯，快来看看！`, url: "https://junyuchen.cn", files: [file] });
-                if (window.__foamTrack) window.__foamTrack("share_image", { method: "web_share_api" });
-                return;
-              }
-            } catch (e) { if (e.name !== "AbortError") console.warn("share failed:", e); }
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url; a.download = "pa-nozzle-result.png"; a.click();
-            URL.revokeObjectURL(url);
-            if (window.__foamTrack) window.__foamTrack("share_image", { method: "download" });
+            const canWebShare = navigator.share && navigator.canShare && navigator.canShare({ files: [file] });
+
+            // 分享按钮（手机端 Web Share API 可用时显示）
+            if (canWebShare) {
+              const shareBtn = document.createElement("button");
+              shareBtn.className = "share-overlay-btn primary";
+              shareBtn.innerHTML = "📤 分享到微信/小红书/抖音";
+              shareBtn.onclick = async () => {
+                try {
+                  await navigator.share({ title: "PA壶喷芯估算结果", text: "推荐喷芯，快来看看！", files: [file] });
+                  if (window.__foamTrack) window.__foamTrack("share_image", { method: "web_share_api" });
+                } catch (e) { if (e.name !== "AbortError") console.warn("share cancelled:", e); }
+              };
+              actions.appendChild(shareBtn);
+            }
+
+            // 保存按钮
+            const saveBtn = document.createElement("button");
+            saveBtn.className = "share-overlay-btn " + (canWebShare ? "secondary" : "primary");
+            saveBtn.innerHTML = "💾 保存图片";
+            saveBtn.onclick = () => {
+              const a = document.createElement("a");
+              a.href = blobUrl; a.download = "pa-nozzle-result.png"; a.click();
+              if (window.__foamTrack) window.__foamTrack("share_image", { method: "download" });
+            };
+            actions.appendChild(saveBtn);
+
+            // 提示文字
+            if (isMobile && !canWebShare) {
+              tip.innerHTML = "💡 也可以 <em>长按图片</em> 保存到相册，再分享到社交平台";
+            } else if (isMobile) {
+              tip.innerHTML = "💡 点击「分享」可直接发送到微信、小红书、抖音等 App";
+            } else {
+              tip.innerHTML = "💡 保存图片后，打开小红书/抖音/微信发布即可分享";
+            }
+
+            overlay.classList.add("active");
+
+            // 关闭逻辑
+            const closeOverlay = () => {
+              overlay.classList.remove("active");
+              setTimeout(() => { URL.revokeObjectURL(blobUrl); img.src = ""; }, 300);
+            };
+            document.getElementById("shareOverlayClose").onclick = closeOverlay;
+            overlay.onclick = (e) => { if (e.target === overlay) closeOverlay(); };
           }, "image/png");
         };
       }
