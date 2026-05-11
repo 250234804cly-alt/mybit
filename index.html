@@ -7,14 +7,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- SEO -->
-  <title>PA 壶喷芯估算台 — 一键计算泡沫壶推荐喷芯尺寸</title>
-  <meta name="description" content="输入洗车机参数或选择型号，一键计算 PA 泡沫壶推荐喷芯直径。支持 30+ 主流洗车机型号数据库，基于伯努利孔口流量模型精准匹配。" />
-  <meta name="keywords" content="PA泡沫壶,喷芯计算器,洗车机喷芯,foam cannon,nozzle calculator,洗车泡沫壶,PA壶,喷芯直径,洗车机配件" />
-  <meta name="author" content="PA Foam Nozzle Calc" />
+  <title>PA STUDIO — 汽美泡沫工具箱</title>
+  <meta name="description" content="PA STUDIO 汽美泡沫工具箱：喷芯计算、PIR配比、洗车液评测三合一。支持 30+ 主流洗车机型号数据库，精准匹配喷芯尺寸与药剂配比。" />
+  <meta name="keywords" content="PA泡沫壶,喷芯计算器,PIR配比,洗车液评测,foam cannon,nozzle calculator,洗车泡沫壶,PA壶,喷芯直径,洗车机配件,汽美工具" />
+  <meta name="author" content="PA STUDIO" />
   <link rel="canonical" href="https://junyuchen.cn/foam-cannon-calculator" />
 
   <!-- Open Graph -->
-  <meta property="og:title" content="PA壶喷芯估算 — 一键计算泡沫壶推荐喷芯尺寸" />
+  <meta property="og:title" content="PA STUDIO — 汽美泡沫工具箱" />
   <meta property="og:description" content="选洗车机型号或手动填参数，一键算出推荐喷芯大小。支持 30+ 主流机型，精准匹配最佳喷芯。" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://junyuchen.cn/foam-cannon-calculator" />
@@ -23,7 +23,7 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="PA壶喷芯估算" />
+  <meta name="twitter:title" content="PA STUDIO" />
   <meta name="twitter:description" content="选洗车机型号或手动填参数，一键算出推荐喷芯大小。" />
 
   <!-- 主题色 -->
@@ -1925,8 +1925,8 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "PA 壶喷芯估算台",
-    "description": "输入洗车机参数或选择型号，一键计算 PA 泡沫壶推荐喷芯直径",
+    "name": "PA STUDIO",
+    "description": "汽美泡沫工具箱：喷芯计算、PIR配比、洗车液评测三合一",
     "url": "https://junyuchen.cn/foam-cannon-calculator",
     "applicationCategory": "UtilityApplication",
     "operatingSystem": "Any",
@@ -1943,9 +1943,9 @@
   <div class="shell">
     <!-- ===== 头部 ===== -->
     <div class="header">
-      <div class="eyebrow">PA FOAM · NOZZLE CALC</div>
-      <h1>PA壶喷芯估算</h1>
-      <p>选洗车机型号或手动填参数，一键算出推荐喷芯大小。</p>
+      <div class="eyebrow">PA STUDIO · 汽美泡沫工具箱</div>
+      <h1>PA STUDIO</h1>
+      <p>喷芯计算 · PIR配比 · 洗车液评测 — 汽美泡沫一站式工具</p>
     </div>
 
     <!-- ===== 主Tab切换 ===== -->
@@ -4397,7 +4397,7 @@
       ctx.font = "500 22px 'Noto Sans SC', sans-serif";
       ctx.fillStyle = "#71f0ff";
       ctx.textAlign = "center";
-      ctx.fillText("PA FOAM · NOZZLE CALC", W / 2, 60);
+      ctx.fillText("PA STUDIO", W / 2, 60);
 
       // ===== 标题 =====
       ctx.font = "900 68px 'Bebas Neue', sans-serif";
@@ -4405,7 +4405,7 @@
       titleGrad.addColorStop(0, "#71f0ff");
       titleGrad.addColorStop(1, "#ceff7b");
       ctx.fillStyle = titleGrad;
-      ctx.fillText("PA壶喷芯估算", W / 2, 128);
+      ctx.fillText("PA STUDIO", W / 2, 128);
 
       // ===== 机型信息 =====
       const modelLine = data.model
@@ -4456,7 +4456,7 @@
               shareBtn.innerHTML = "📤 分享到微信/小红书/抖音";
               shareBtn.onclick = async () => {
                 try {
-                  await navigator.share({ title: "PA壶喷芯估算结果", text: "推荐喷芯，快来看看！", files: [file] });
+                  await navigator.share({ title: "PA STUDIO 计算结果", text: "推荐喷芯，快来看看！", files: [file] });
                   if (window.__foamTrack) window.__foamTrack("share_image", { method: "web_share_api" });
                 } catch (e) { if (e.name !== "AbortError") console.warn("share cancelled:", e); }
               };
