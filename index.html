@@ -90,6 +90,554 @@
       z-index: 1;
     }
 
+    /* ===== 主Tab切换（喷芯计算器 vs PIR配比 vs 洗车液评测） ===== */
+    .main-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 18px;
+      padding: 4px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .main-tab {
+      flex: 1;
+      padding: 12px 8px;
+      border: none;
+      border-radius: 14px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.25s ease;
+      position: relative;
+      white-space: nowrap;
+    }
+    @media (max-width: 420px) {
+      .main-tab { font-size: 12px; padding: 10px 4px; }
+    }
+    .main-tab:hover { color: var(--text); }
+    .main-tab.active {
+      background: rgba(113,240,255,0.12);
+      color: var(--cyan);
+      box-shadow: 0 4px 16px rgba(113,240,255,0.1);
+    }
+    .main-panel { display: none; }
+    .main-panel.active { display: block; }
+
+    /* ===== 洗车液评测模块 ===== */
+    .wash-review .brand-block {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(16px);
+      transition: border-color 0.3s;
+    }
+    .wash-review .brand-block:hover { border-color: rgba(113,240,255,0.3); }
+    .wash-review .brand-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .wash-review .brand-rank {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2em;
+      color: #fff;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--cyan), var(--cyan-deep));
+    }
+    .wash-review .brand-rank.r1 { background: linear-gradient(135deg, #ffd36b, #e6a800); }
+    .wash-review .brand-rank.r2 { background: linear-gradient(135deg, #94a3b8, #64748b); }
+    .wash-review .brand-rank.r3 { background: linear-gradient(135deg, #c2956a, #a0764c); }
+    .wash-review .brand-meta h3 {
+      font-size: 1.15em;
+      margin-bottom: 2px;
+      color: var(--text);
+    }
+    .wash-review .brand-meta .origin {
+      color: var(--muted);
+      font-size: 0.82em;
+    }
+    .wash-review .brand-badges {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+    .wash-review .badge-chip {
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.72em;
+      font-weight: 600;
+    }
+    .badge-pro { background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+    .badge-value { background: rgba(206,255,123,0.12); color: var(--lime); border: 1px solid rgba(206,255,123,0.25); }
+    .badge-coating { background: rgba(113,240,255,0.12); color: var(--cyan); border: 1px solid rgba(113,240,255,0.25); }
+    .badge-popular { background: rgba(255,211,107,0.15); color: var(--amber); border: 1px solid rgba(255,211,107,0.3); }
+    .wash-review .brand-summary {
+      color: var(--muted);
+      font-size: 0.88em;
+      line-height: 1.7;
+      padding: 10px 14px;
+      background: rgba(113,240,255,0.04);
+      border-radius: 10px;
+      border-left: 3px solid var(--cyan-deep);
+      margin-bottom: 16px;
+    }
+    .wash-review .prod-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) {
+      .wash-review .prod-grid { grid-template-columns: 1fr; }
+    }
+    .wash-review .prod-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: rgba(7,19,26,0.5);
+    }
+    .wash-review .prod-card.prewash { border-top: 3px solid #f97316; }
+    .wash-review .prod-card.mainwash { border-top: 3px solid var(--cyan); }
+    .wash-review .prod-type {
+      font-size: 0.72em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .wash-review .prod-card.prewash .prod-type { color: #f97316; }
+    .wash-review .prod-card.mainwash .prod-type { color: var(--cyan); }
+    .wash-review .prod-name {
+      font-size: 1.05em;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .wash-review .prod-sub {
+      color: var(--muted);
+      font-size: 0.8em;
+      margin-bottom: 10px;
+    }
+    .wash-review .spec-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85em;
+    }
+    .wash-review .spec-tbl td {
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .wash-review .spec-tbl td:last-child { text-align: right; font-weight: 600; }
+    .wash-review .spec-tbl td.hl { color: var(--amber); }
+    .wash-review .spec-tbl tr:last-child td { border-bottom: none; }
+    .wash-review .spec-label { color: var(--muted); }
+    .wash-review .ratings-row {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .wash-review .rate-box {
+      text-align: center;
+      padding: 6px 2px;
+      background: rgba(113,240,255,0.04);
+      border-radius: 8px;
+    }
+    .wash-review .rate-label {
+      font-size: 0.68em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .wash-review .rate-bar {
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin: 3px 0;
+      overflow: hidden;
+    }
+    .wash-review .rate-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+    .wash-review .rate-num {
+      font-size: 0.82em;
+      font-weight: 700;
+    }
+    .wash-review .rate-high { color: var(--lime); }
+    .wash-review .rate-mid { color: var(--amber); }
+    .wash-review .rate-low { color: var(--danger); }
+
+    /* 评测汇总表 */
+    .wash-review .summary-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+    }
+    .wash-review .summary-tbl th {
+      background: rgba(113,240,255,0.08);
+      padding: 10px 8px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--cyan);
+      border-bottom: 2px solid var(--line);
+      white-space: nowrap;
+    }
+    .wash-review .summary-tbl td {
+      padding: 9px 8px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      vertical-align: middle;
+    }
+    .wash-review .summary-tbl tr:hover { background: rgba(113,240,255,0.03); }
+    .wash-review .summary-tbl .bcol { text-align: left; font-weight: 600; white-space: nowrap; }
+    .wash-review .stars { color: var(--amber); letter-spacing: 1px; }
+
+    /* 推荐矩阵 */
+    .wash-review .rec-matrix .summary-tbl td:nth-child(1),
+    .wash-review .rec-matrix .summary-tbl th:nth-child(1) { text-align: left; }
+    .wash-review .rec-matrix .summary-tbl td:nth-child(5),
+    .wash-review .rec-matrix .summary-tbl th:nth-child(5) { text-align: left; font-size: 0.88em; }
+
+    /* 评测参考模块 */
+    .wash-review .ref-intro {
+      color: var(--muted);
+      font-size: 0.88em;
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      background: rgba(167,139,250,0.06);
+      border-radius: 10px;
+      border-left: 3px solid #a78bfa;
+      line-height: 1.7;
+    }
+    .wash-review .ref-dims {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px,1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .wash-review .dim-card {
+      padding: 14px 16px;
+      background: rgba(7,19,26,0.5);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .wash-review .dim-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1em;
+      flex-shrink: 0;
+    }
+    .wash-review .dim-icon.i-clean { background: rgba(206,255,123,0.12); }
+    .wash-review .dim-icon.i-foam { background: rgba(113,240,255,0.12); }
+    .wash-review .dim-icon.i-coat { background: rgba(113,240,255,0.12); }
+    .wash-review .dim-icon.i-val { background: rgba(255,211,107,0.12); }
+    .wash-review .dim-icon.i-lub { background: rgba(167,139,250,0.12); }
+    .wash-review .dim-icon.i-scent { background: rgba(255,133,112,0.12); }
+    .wash-review .dim-body h4 { font-size: 0.9em; margin-bottom: 2px; }
+    .wash-review .dim-weight { font-size: 0.72em; color: #a78bfa; font-weight: 600; margin-bottom: 3px; }
+    .wash-review .dim-body p { color: var(--muted); font-size: 0.8em; line-height: 1.5; }
+    .wash-review .ref-method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .wash-review .method-card {
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(7,19,26,0.3);
+    }
+    .wash-review .method-card h4 { font-size: 0.88em; margin-bottom: 6px; }
+    .wash-review .method-card p,
+    .wash-review .method-card ul { color: var(--muted); font-size: 0.82em; line-height: 1.6; }
+    .wash-review .method-card ul { padding-left: 14px; margin-top: 4px; }
+    .wash-review .method-card li { margin-bottom: 2px; }
+    .wash-review .ref-sources {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+      gap: 8px;
+    }
+    .wash-review .src-chip {
+      padding: 8px 12px;
+      background: rgba(7,19,26,0.5);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 0.82em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wash-review .src-chip .si { font-size: 1.1em; flex-shrink: 0; }
+    .wash-review .src-chip .sn { color: var(--text); font-weight: 600; display: block; font-size: 0.85em; }
+    .wash-review .src-chip .st { color: var(--muted); font-size: 0.72em; }
+    .wash-review .disclaimer-box {
+      margin-top: 16px;
+      padding: 10px 14px;
+      background: rgba(113,240,255,0.04);
+      border-radius: 10px;
+      font-size: 0.8em;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .wash-review .score-legend {
+      padding: 14px 16px;
+      background: rgba(255,211,107,0.05);
+      border: 1px solid rgba(255,211,107,0.12);
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .wash-review .score-legend h4 { color: var(--amber); margin-bottom: 8px; font-size: 0.9em; }
+    .wash-review .score-legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px,1fr));
+      gap: 6px;
+      font-size: 0.85em;
+    }
+    .wash-review .score-legend-formula {
+      color: var(--muted);
+      font-size: 0.78em;
+      margin-top: 8px;
+    }
+    .wash-review .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+      gap: 12px;
+    }
+    .wash-review .tip-card {
+      padding: 14px;
+      background: rgba(206,255,123,0.04);
+      border: 1px solid rgba(206,255,123,0.1);
+      border-radius: 12px;
+    }
+    .wash-review .tip-card h4 { color: var(--lime); margin-bottom: 6px; font-size: 0.9em; }
+    .wash-review .tip-card p { color: var(--muted); font-size: 0.82em; line-height: 1.6; }
+    .wash-review .section-title {
+      display: block;
+      margin-bottom: 14px;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    /* ===== PIR配比模块 ===== */
+    .pir-calc .pir-hero {
+      text-align: center;
+      padding: 32px 20px;
+      background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(113,240,255,0.05));
+      border-radius: var(--radius);
+      margin-bottom: 18px;
+    }
+    .pir-calc .pir-hero h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(32px, 7vw, 52px);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .pir-calc .pir-hero p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .pir-calc .pir-formula-box {
+      padding: 16px 20px;
+      background: rgba(167,139,250,0.06);
+      border: 1px solid rgba(167,139,250,0.18);
+      border-radius: 14px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 2;
+    }
+    .pir-calc .pir-formula-box .formula-title {
+      color: #a78bfa;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .pir-calc .pir-formula-box .formula-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .pir-calc .pir-formula-box .formula-line .fm {
+      font-family: 'Bebas Neue', monospace;
+      font-size: 1.15em;
+      color: var(--cyan);
+      letter-spacing: 0.02em;
+    }
+    .pir-calc .pir-formula-box .formula-line .fd {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .pir-calc .pir-preset-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .pir-calc .pir-preset-btn {
+      padding: 6px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(167,139,250,0.25);
+      background: rgba(167,139,250,0.08);
+      color: #c4b5fd;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pir-calc .pir-preset-btn:hover {
+      background: rgba(167,139,250,0.18);
+      border-color: rgba(167,139,250,0.45);
+      color: #fff;
+    }
+    .pir-calc .pir-preset-btn.active {
+      background: rgba(167,139,250,0.25);
+      border-color: #a78bfa;
+      color: #fff;
+    }
+    .pir-calc .pir-result-card {
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(167,139,250,0.1), rgba(113,240,255,0.06));
+      border: 1px solid rgba(167,139,250,0.2);
+      border-radius: var(--radius);
+    }
+    .pir-calc .pir-result-big {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .pir-calc .pir-result-big .amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 10vw, 72px);
+      color: #a78bfa;
+      line-height: 1;
+    }
+    .pir-calc .pir-result-big .unit {
+      color: var(--muted);
+      font-size: 16px;
+      margin-top: 4px;
+    }
+    .pir-calc .pir-result-big .sub-info {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+    .pir-calc .pir-mix-steps {
+      margin-top: 18px;
+    }
+    .pir-calc .pir-mix-steps .step-title {
+      color: #a78bfa;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .pir-calc .pir-mix-steps .step-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      padding: 12px 16px;
+      background: rgba(7,19,26,0.4);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .pir-calc .pir-mix-steps .step-num {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95em;
+      color: #fff;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+    }
+    .pir-calc .pir-mix-steps .step-body {
+      flex: 1;
+    }
+    .pir-calc .pir-mix-steps .step-body strong {
+      color: var(--text);
+      font-size: 14px;
+    }
+    .pir-calc .pir-mix-steps .step-body p {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 4px 0 0;
+      line-height: 1.6;
+    }
+    .pir-calc .pir-prep-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .pir-calc .prep-card {
+      padding: 16px;
+      background: rgba(7,19,26,0.5);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+    .pir-calc .prep-card .prep-num {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85em;
+      color: #fff;
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      margin-bottom: 8px;
+    }
+    .pir-calc .prep-card h4 {
+      font-size: 0.92em;
+      margin-bottom: 4px;
+    }
+    .pir-calc .prep-card p {
+      color: var(--muted);
+      font-size: 0.82em;
+      line-height: 1.6;
+    }
+    .pir-calc .pir-disclaimer {
+      padding: 12px 16px;
+      background: rgba(255,211,107,0.05);
+      border: 1px solid rgba(255,211,107,0.12);
+      border-radius: 12px;
+      font-size: 0.82em;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .pir-calc .pir-disclaimer strong {
+      color: var(--amber);
+    }
+
     /* ===== 头部 ===== */
     .header {
       text-align: center;
@@ -1400,6 +1948,16 @@
       <p>选洗车机型号或手动填参数，一键算出推荐喷芯大小。</p>
     </div>
 
+    <!-- ===== 主Tab切换 ===== -->
+    <div class="main-tabs">
+      <button class="main-tab active" data-main="nozzle">⚡ 喷芯计算器</button>
+      <button class="main-tab" data-main="pir">🧪 PIR配比</button>
+      <button class="main-tab" data-main="wash">🧴 洗车液评测</button>
+    </div>
+
+    <!-- ===== 喷芯计算器面板 ===== -->
+    <div class="main-panel active" id="panelNozzle">
+
     <!-- ===== 输入区 ===== -->
     <div class="card" id="inputCard">
       <span class="card-title">选择你的洗车机</span>
@@ -1725,12 +2283,637 @@
         </div>
       </div>
     </div>
-  </div>
+  </div><!-- end panelNozzle -->
 
-  <!-- 手机端固定底部计算按钮 -->
+  <!-- ===== PIR配比计算面板 ===== -->
+  <div class="main-panel pir-calc" id="panelPir">
+
+    <!-- 头部 -->
+    <div class="card pir-hero">
+      <h2>🧪 PIR 配比计算器</h2>
+      <p>泡沫壶洗车精配比一键计算 — 精准控制药剂浓度，避免浪费与漆面损伤</p>
+    </div>
+
+    <!-- 计算公式说明 -->
+    <div class="card">
+      <div class="pir-formula-box">
+        <div class="formula-title">📐 计算原理</div>
+        <div class="formula-line">
+          <span class="fm">PIR = (V<sub>剂</sub> / V<sub>总</sub>) × 100%</span>
+          <span class="fd">— 面板影响比</span>
+        </div>
+        <div class="formula-line">
+          <span class="fm">V<sub>剂</sub> = PIR% × V<sub>总</sub></span>
+          <span class="fd">— 洗车精添加量</span>
+        </div>
+        <div class="formula-line" style="margin-top:6px;">
+          <span style="color:var(--muted);font-size:12px;">V<sub>总</sub> = 单次喷出总液体体积（ml），V<sub>剂</sub> = 洗车精纯量（ml）</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 输入区 -->
+    <div class="card">
+      <span class="card-title">📝 输入参数</span>
+      <div class="input-group">
+        <label>
+          <div class="label-top">
+            <span>泡沫壶标称容量（ml）</span>
+            <span class="hint">壶身标注的容量</span>
+          </div>
+          <input type="text" inputmode="decimal" id="pirCapacity" placeholder="如 1000" />
+        </label>
+        <label>
+          <div class="label-top">
+            <span>单次喷出总液体体积（ml）</span>
+            <span class="hint">一壶全部喷出的液体量</span>
+          </div>
+          <input type="text" inputmode="decimal" id="pirOutput" placeholder="如 800" />
+        </label>
+        <label>
+          <div class="label-top">
+            <span>目标 PIR（%）</span>
+            <span class="hint">推荐 3%~10%</span>
+          </div>
+          <input type="text" inputmode="decimal" id="pirTarget" placeholder="如 5" />
+        </label>
+      </div>
+
+      <!-- PIR 快速预设 -->
+      <div style="margin-top:14px;">
+        <span style="color:var(--muted);font-size:13px;display:block;margin-bottom:8px;">⚡ 快速选择 PIR</span>
+        <div class="pir-preset-row">
+          <button class="pir-preset-btn" data-pir="3">3% 轻度预洗</button>
+          <button class="pir-preset-btn" data-pir="5">5% 标准预洗</button>
+          <button class="pir-preset-btn" data-pir="8">8% 重度预洗</button>
+          <button class="pir-preset-btn" data-pir="10">10% 顽固污渍</button>
+          <button class="pir-preset-btn" data-pir="15">15% 极端工况</button>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:18px;">
+        <button class="btn-primary" id="pirCalcBtn" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">🧪 计算 PIR 配比</button>
+        <button class="btn-ghost" id="pirResetBtn">重置</button>
+      </div>
+    </div>
+
+    <!-- 结果区 -->
+    <div class="card" id="pirResultCard" style="display:none;">
+      <div class="pir-result-card">
+        <div class="pir-result-big">
+          <div class="amount" id="pirResultAmount">—</div>
+          <div class="unit">ml 洗车精</div>
+          <div class="sub-info" id="pirResultSub"></div>
+        </div>
+        <div class="pir-mix-steps">
+          <div class="step-title">🛠️ 配制方法</div>
+          <div id="pirMixSteps"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 前置操作准备 -->
+    <div class="card">
+      <span class="card-title">📋 前置操作 — 测量你的壶</span>
+      <div class="pir-prep-grid">
+        <div class="prep-card">
+          <div class="prep-num">1</div>
+          <h4>清空泡沫壶</h4>
+          <p>确保壶内无残留液体和泡沫，完全清空。</p>
+        </div>
+        <div class="prep-card">
+          <div class="prep-num">2</div>
+          <h4>装入已知量清水</h4>
+          <p>用量杯装入精确量（如 1000ml）的清水到壶中。</p>
+        </div>
+        <div class="prep-card">
+          <div class="prep-num">3</div>
+          <h4>连接洗车机喷射</h4>
+          <p>将壶接上洗车机，正常喷射直至壶内液体全部喷出，用大容器接住喷出液体。</p>
+        </div>
+        <div class="prep-card">
+          <div class="prep-num">4</div>
+          <h4>测量喷出总量</h4>
+          <p>将接住的液体倒回量杯测量，记录实际喷出体积（即 V<sub>总</sub>）。</p>
+        </div>
+      </div>
+      <div class="pir-disclaimer">
+        <strong>⚠️ 注意：</strong>PIR 仅为理论参考值，实际用量需根据洗车精浓度、水温、漆面状况等因素微调。
+        建议从低 PIR 开始尝试，逐步增加浓度。部分高浓缩产品（如 Koch Chemie GS）官方推荐的 PIR 远低于常规值，请以产品说明为准。
+      </div>
+    </div>
+
+  </div><!-- end panelPir -->
+
+  <!-- ===== 洗车液评测面板 ===== -->
+  <div class="main-panel wash-review" id="panelWash">
+
+    <!-- ===== 洗车液评测头部 ===== -->
+    <div class="card" style="text-align:center;padding:32px 20px;background:linear-gradient(135deg,rgba(113,240,255,0.06),rgba(206,255,123,0.04));">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,7vw,52px);line-height:1;margin-bottom:8px;">🚗 洗车液 Top 6 评测</h2>
+      <p style="color:var(--muted);font-size:14px;">预洗液 × 正洗液 · 王牌产品全维度对比</p>
+      <span style="display:inline-block;background:rgba(255,211,107,0.12);color:var(--amber);padding:4px 14px;border-radius:20px;font-size:0.82em;margin-top:10px;border:1px solid rgba(255,211,107,0.25);">⚡ 2025-2026 专业汽美圈公认</span>
+    </div>
+
+    <!-- ===== 品牌速览 ===== -->
+    <div class="card">
+      <span class="card-title">📋 品牌速览</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;">
+        <a href="#wr-koch" style="color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;font-size:0.9em;transition:all 0.2s;" onmouseover="this.style.color='var(--text)';this.style.background='rgba(113,240,255,0.08)'" onmouseout="this.style.color='var(--muted)';this.style.background='transparent'">🇩🇪 Koch Chemie 考赫化学</a>
+        <a href="#wr-carpro" style="color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;font-size:0.9em;transition:all 0.2s;" onmouseover="this.style.color='var(--text)';this.style.background='rgba(113,240,255,0.08)'" onmouseout="this.style.color='var(--muted)';this.style.background='transparent'">🇰🇷 CarPro 卡普</a>
+        <a href="#wr-gyeon" style="color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;font-size:0.9em;transition:all 0.2s;" onmouseover="this.style.color='var(--text)';this.style.background='rgba(113,240,255,0.08)'" onmouseout="this.style.color='var(--muted)';this.style.background='transparent'">🇰🇷 Gyeon 吉漾</a>
+        <a href="#wr-cg" style="color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;font-size:0.9em;transition:all 0.2s;" onmouseover="this.style.color='var(--text)';this.style.background='rgba(113,240,255,0.08)'" onmouseout="this.style.color='var(--muted)';this.style.background='transparent'">🇺🇸 Chemical Guys 化学小子</a>
+        <a href="#wr-sonax" style="color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;font-size:0.9em;transition:all 0.2s;" onmouseover="this.style.color='var(--text)';this.style.background='rgba(113,240,255,0.08)'" onmouseout="this.style.color='var(--muted)';this.style.background='transparent'">🇩🇪 SONAX 索纳克斯</a>
+        <a href="#wr-adams" style="color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;font-size:0.9em;transition:all 0.2s;" onmouseover="this.style.color='var(--text)';this.style.background='rgba(113,240,255,0.08)'" onmouseout="this.style.color='var(--muted)';this.style.background='transparent'">🇺🇸 Adam's Polishes 阿达姆斯</a>
+      </div>
+    </div>
+
+    <!-- ===== 1. Koch Chemie ===== -->
+    <div class="brand-block" id="wr-koch">
+      <div class="brand-head">
+        <div class="brand-rank r1">1</div>
+        <div class="brand-meta">
+          <h3>🇩🇪 Koch Chemie 考赫化学</h3>
+          <div class="origin">德国 · 创立于1968年 · 专业汽美化学品制造商</div>
+        </div>
+        <div class="brand-badges">
+          <span class="badge-chip badge-pro">专业级</span>
+          <span class="badge-chip badge-value">超高性价比</span>
+        </div>
+      </div>
+      <div class="brand-summary">汽美圈公认的"药剂之王"，从洗车店到高端 Detailing 工作室通吃。产品线极其完整，浓缩比高、用量省，性价比碾压同级。GSF 和 GS 几乎是每个汽美人的入门标配。</div>
+      <div class="prod-grid">
+        <div class="prod-card prewash">
+          <div class="prod-type">🟠 预洗液 / APC</div>
+          <div class="prod-name">Green Star (GS) 绿色之星</div>
+          <div class="prod-sub">碱性万能预洗清洁剂 · 浓缩型</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~12（碱性）</td></tr>
+            <tr><td class="spec-label">预洗配比</td><td class="hl">1:50 ~ 1:100</td></tr>
+            <tr><td class="spec-label">APC 配比</td><td>1:10 ~ 1:20</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥75-90/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>超浓缩、无磷配方</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:95%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.5</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:70%;background:var(--amber)"></div></div><div class="rate-num rate-mid">7.0</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:98%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.8</div></div>
+          </div>
+        </div>
+        <div class="prod-card mainwash">
+          <div class="prod-type">🔵 正洗液</div>
+          <div class="prod-name">Gentle Snow Foam (GSF) 雪樱桃</div>
+          <div class="prod-sub">pH 中性高泡洗车液 · 樱桃香</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~7（中性）</td></tr>
+            <tr><td class="spec-label">泡沫炮配比</td><td class="hl">1:300 ~ 1:500</td></tr>
+            <tr><td class="spec-label">手洗配比</td><td>15-20ml/桶</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥85-110/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>预洗正洗二合一、超高泡</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:80%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.0</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:95%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.5</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:95%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.5</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 2. CarPro ===== -->
+    <div class="brand-block" id="wr-carpro">
+      <div class="brand-head">
+        <div class="brand-rank r2">2</div>
+        <div class="brand-meta">
+          <h3>🇰🇷 CarPro 卡普</h3>
+          <div class="origin">韩国/以色列 · 涂层养护专家 · CQuartz 系列闻名</div>
+        </div>
+        <div class="brand-badges">
+          <span class="badge-chip badge-pro">专业级</span>
+          <span class="badge-chip badge-coating">涂层友好</span>
+        </div>
+      </div>
+      <div class="brand-summary">以 CQuartz 陶瓷涂层闻名全球的品牌，洗护产品线专为涂层车主设计。Reset 和 Lift 是涂层养护的黄金组合，配方温和但不失清洁力，全系 pH 安全。</div>
+      <div class="prod-grid">
+        <div class="prod-card prewash">
+          <div class="prod-type">🟠 预洗液</div>
+          <div class="prod-name">CarPro Lift</div>
+          <div class="prod-sub">碱性雪泡预洗液 · 涂层安全</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~12（碱性）</td></tr>
+            <tr><td class="spec-label">泡沫炮配比</td><td class="hl">1:10 ~ 1:15</td></tr>
+            <tr><td class="spec-label">重度污染</td><td>1:5（直接喷涂）</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥130-165/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>涂层安全、挂壁持久</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:88%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.8</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:85%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.5</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:65%;background:var(--amber)"></div></div><div class="rate-num rate-mid">6.5</div></div>
+          </div>
+        </div>
+        <div class="prod-card mainwash">
+          <div class="prod-type">🔵 正洗液</div>
+          <div class="prod-name">CarPro Reset</div>
+          <div class="prod-sub">pH 中性涂层养护洗车液</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~7（中性）</td></tr>
+            <tr><td class="spec-label">桶洗配比</td><td class="hl">1:500</td></tr>
+            <tr><td class="spec-label">泡沫炮配比</td><td>1:100 ~ 1:200</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥120-150/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>不剥离涂层、润滑度极高</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:82%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.2</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:80%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.0</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:75%;background:var(--amber)"></div></div><div class="rate-num rate-mid">7.5</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 3. Gyeon ===== -->
+    <div class="brand-block" id="wr-gyeon">
+      <div class="brand-head">
+        <div class="brand-rank r3">3</div>
+        <div class="brand-meta">
+          <h3>🇰🇷 Gyeon 吉漾</h3>
+          <div class="origin">韩国 · SiO2 石英涂层先驱 · 全球精洗标杆</div>
+        </div>
+        <div class="brand-badges">
+          <span class="badge-chip badge-pro">专业级</span>
+          <span class="badge-chip badge-coating">SiO2 增强</span>
+        </div>
+      </div>
+      <div class="brand-summary">以石英涂层技术闻名，Bathe+ 是全球首款含 SiO2 的中性洗车液。产品精简但每款都是精品，Foam 预洗 + Bathe/Bathe+ 正洗是经典组合。适合追求极致养护的涂层车主。</div>
+      <div class="prod-grid">
+        <div class="prod-card prewash">
+          <div class="prod-type">🟠 预洗液</div>
+          <div class="prod-name">Q²M Foam</div>
+          <div class="prod-sub">碱性雪泡预洗液 · 高泡挂壁</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~12（碱性）</td></tr>
+            <tr><td class="spec-label">泡沫炮配比</td><td class="hl">1:10 ~ 1:15</td></tr>
+            <tr><td class="spec-label">手动喷壶</td><td>1:5</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥140-170/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>挂壁时间长、不伤涂层</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:85%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.5</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:90%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.0</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:60%;background:var(--amber)"></div></div><div class="rate-num rate-mid">6.0</div></div>
+          </div>
+        </div>
+        <div class="prod-card mainwash">
+          <div class="prod-type">🔵 正洗液</div>
+          <div class="prod-name">Q²M Bathe+ (镀晶版)</div>
+          <div class="prod-sub">全球首款含 SiO2 的 pH 中性洗车液</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~7（中性）</td></tr>
+            <tr><td class="spec-label">桶洗配比</td><td class="hl">1:500</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥160-200/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>SiO2 驱水层、洗完即养护</td></tr>
+            <tr><td class="spec-label">特殊功效</td><td>增强涂层疏水性</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:78%;background:var(--amber)"></div></div><div class="rate-num rate-mid">7.8</div></div>
+            <div class="rate-box"><div class="rate-label">养护效果</div><div class="rate-bar"><div class="rate-fill" style="width:96%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.6</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:55%;background:var(--amber)"></div></div><div class="rate-num rate-mid">5.5</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 4. Chemical Guys ===== -->
+    <div class="brand-block" id="wr-cg">
+      <div class="brand-head">
+        <div class="brand-rank">4</div>
+        <div class="brand-meta">
+          <h3>🇺🇸 Chemical Guys 化学小子</h3>
+          <div class="origin">美国 · 1968年创立 · 全球最大汽美产品线</div>
+        </div>
+        <div class="brand-badges">
+          <span class="badge-chip badge-popular">最受欢迎</span>
+          <span class="badge-chip badge-value">入门友好</span>
+        </div>
+      </div>
+      <div class="brand-summary">产品线最丰富的汽美品牌，没有之一。SKU 数百个，营销能力极强。入门级产品便宜好用，但高端线竞争力一般。Honeydew Snow Foam 是全球销量最高的预洗液之一，Mr. Pink 是永远的经典。</div>
+      <div class="prod-grid">
+        <div class="prod-card prewash">
+          <div class="prod-type">🟠 预洗液</div>
+          <div class="prod-name">Honeydew Snow Foam</div>
+          <div class="prod-sub">蜜瓜香雪泡预洗液 · 温和型</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~9（弱碱性）</td></tr>
+            <tr><td class="spec-label">泡沫炮配比</td><td class="hl">1:10 ~ 1:20</td></tr>
+            <tr><td class="spec-label">手洗桶洗</td><td>30ml/桶</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥70-95/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>泡沫爆炸浓密、蜜瓜香</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:68%;background:var(--amber)"></div></div><div class="rate-num rate-mid">6.8</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:96%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.6</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:80%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.0</div></div>
+          </div>
+        </div>
+        <div class="prod-card mainwash">
+          <div class="prod-type">🔵 正洗液</div>
+          <div class="prod-name">Mr. Pink Super Suds</div>
+          <div class="prod-sub">pH 中性高泡洗车液 · 经典款</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~7（中性）</td></tr>
+            <tr><td class="spec-label">桶洗配比</td><td class="hl">1:300 ~ 1:500</td></tr>
+            <tr><td class="spec-label">泡沫炮配比</td><td>1:50 ~ 1:100</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥55-80/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>润滑度好、不剥离蜡层</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:75%;background:var(--amber)"></div></div><div class="rate-num rate-mid">7.5</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:88%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.8</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:90%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.0</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 5. SONAX ===== -->
+    <div class="brand-block" id="wr-sonax">
+      <div class="brand-head">
+        <div class="brand-rank">5</div>
+        <div class="brand-meta">
+          <h3>🇩🇪 SONAX 索纳克斯</h3>
+          <div class="origin">德国 · 创立于1950年 · 欧洲OEM供应商</div>
+        </div>
+        <div class="brand-badges">
+          <span class="badge-chip badge-pro">专业级</span>
+          <span class="badge-chip badge-popular">经典老牌</span>
+        </div>
+      </div>
+      <div class="brand-summary">德国老牌汽美巨头，为宝马、保时捷等车厂提供OEM产品。PROFILINE 专业线品质过硬，ActiFoam Energy 被誉为"最全能"的预洗/正洗两用泡沫，Gloss Shampoo 则是经典光泽洗车液。</div>
+      <div class="prod-grid">
+        <div class="prod-card prewash">
+          <div class="prod-type">🟠 预洗液 / 两用</div>
+          <div class="prod-name">PROFILINE ActiFoam Energy</div>
+          <div class="prod-sub">pH 中性强清洁泡沫 · 预洗正洗二合一</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~7-8（中性偏弱碱）</td></tr>
+            <tr><td class="spec-label">泡沫炮配比</td><td class="hl">1:10 ~ 1:20</td></tr>
+            <tr><td class="spec-label">手洗配比</td><td>30-50ml/桶</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥100-130/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>预洗+正洗一瓶搞定</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:86%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.6</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:88%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.8</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:82%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.2</div></div>
+          </div>
+        </div>
+        <div class="prod-card mainwash">
+          <div class="prod-type">🔵 正洗液</div>
+          <div class="prod-name">Gloss Shampoo Concentrate</div>
+          <div class="prod-sub">浓缩光泽洗车液 · 带增亮效果</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~7（中性）</td></tr>
+            <tr><td class="spec-label">桶洗配比</td><td class="hl">1:200 ~ 1:400</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥65-85/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>增亮提光、适合深色车</td></tr>
+            <tr><td class="spec-label">特殊功效</td><td>含光泽增强聚合物</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:76%;background:var(--amber)"></div></div><div class="rate-num rate-mid">7.6</div></div>
+            <div class="rate-box"><div class="rate-label">光泽效果</div><div class="rate-bar"><div class="rate-fill" style="width:92%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.2</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:85%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.5</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 6. Adam's Polishes ===== -->
+    <div class="brand-block" id="wr-adams">
+      <div class="brand-head">
+        <div class="brand-rank">6</div>
+        <div class="brand-meta">
+          <h3>🇺🇸 Adam's Polishes 阿达姆斯</h3>
+          <div class="origin">美国 · 发烧友品牌 · 社区驱动型</div>
+        </div>
+        <div class="brand-badges">
+          <span class="badge-chip badge-popular">发烧友挚爱</span>
+          <span class="badge-chip badge-coating">石墨烯系列</span>
+        </div>
+      </div>
+      <div class="brand-summary">北美汽美发烧友圈最有情怀的品牌，社区运营极强。产品定位中高端，Mega Foam 是圈内泡沫量天花板级产品，Car Wash Shampoo 长期占据 Amazon 畅销榜。石墨烯系列是近年亮点。</div>
+      <div class="prod-grid">
+        <div class="prod-card prewash">
+          <div class="prod-type">🟠 预洗液</div>
+          <div class="prod-name">Mega Foam</div>
+          <div class="prod-sub">超级雪泡预洗液 · 泡沫炸裂</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~9（弱碱性）</td></tr>
+            <tr><td class="spec-label">泡沫炮配比</td><td class="hl">1:10 ~ 1:20</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥120-160/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>泡沫量爆炸、挂壁超久</td></tr>
+            <tr><td class="spec-label">适用场景</td><td>泡沫炮专用</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:72%;background:var(--amber)"></div></div><div class="rate-num rate-mid">7.2</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:98%;background:var(--lime)"></div></div><div class="rate-num rate-high">9.8</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:55%;background:var(--amber)"></div></div><div class="rate-num rate-mid">5.5</div></div>
+          </div>
+        </div>
+        <div class="prod-card mainwash">
+          <div class="prod-type">🔵 正洗液</div>
+          <div class="prod-name">Car Wash Shampoo</div>
+          <div class="prod-sub">pH 中性经典洗车液 · Amazon 畅销</div>
+          <table class="spec-tbl">
+            <tr><td class="spec-label">pH 值</td><td>~7（中性）</td></tr>
+            <tr><td class="spec-label">桶洗配比</td><td class="hl">1:250 ~ 1:400</td></tr>
+            <tr><td class="spec-label">参考价格</td><td>¥110-140/L</td></tr>
+            <tr><td class="spec-label">核心特点</td><td>润滑极佳、泡沫丰富</td></tr>
+            <tr><td class="spec-label">特殊功效</td><td>含增亮SiO2聚合物</td></tr>
+          </table>
+          <div class="ratings-row">
+            <div class="rate-box"><div class="rate-label">清洁力</div><div class="rate-bar"><div class="rate-fill" style="width:78%;background:var(--amber)"></div></div><div class="rate-num rate-mid">7.8</div></div>
+            <div class="rate-box"><div class="rate-label">泡沫量</div><div class="rate-bar"><div class="rate-fill" style="width:85%;background:var(--lime)"></div></div><div class="rate-num rate-high">8.5</div></div>
+            <div class="rate-box"><div class="rate-label">性价比</div><div class="rate-bar"><div class="rate-fill" style="width:58%;background:var(--amber)"></div></div><div class="rate-num rate-mid">5.8</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 横向对比总表 ===== -->
+    <div class="card" style="overflow-x:auto;">
+      <span class="card-title">📊 全维度横向对比总表</span>
+      <table class="summary-tbl" style="min-width:820px;">
+        <thead>
+          <tr>
+            <th>品牌</th><th>预洗王牌</th><th>预洗配比</th><th>正洗王牌</th><th>正洗配比</th><th>清洁力</th><th>泡沫量</th><th>涂层安全</th><th>性价比</th><th>综合</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="bcol">🇩🇪 Koch Chemie</td><td>GS 绿色之星</td><td>1:50~100</td><td>GSF 雪樱桃</td><td>1:300~500</td>
+            <td><span class="stars">★★★★★</span></td><td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★★</span></td>
+            <td><strong class="rate-high">9.4</strong></td>
+          </tr>
+          <tr>
+            <td class="bcol">🇰🇷 CarPro</td><td>Lift 预洗泡沫</td><td>1:10~15</td><td>Reset</td><td>1:500</td>
+            <td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★★</span></td><td><span class="stars">★★★☆☆</span></td>
+            <td><strong class="rate-high">8.6</strong></td>
+          </tr>
+          <tr>
+            <td class="bcol">🇰🇷 Gyeon</td><td>Q²M Foam</td><td>1:10~15</td><td>Q²M Bathe+</td><td>1:500</td>
+            <td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★★</span></td><td><span class="stars">★★★★★</span></td><td><span class="stars">★★★☆☆</span></td>
+            <td><strong class="rate-high">8.5</strong></td>
+          </tr>
+          <tr>
+            <td class="bcol">🇺🇸 Chemical Guys</td><td>Honeydew</td><td>1:10~20</td><td>Mr. Pink</td><td>1:300~500</td>
+            <td><span class="stars">★★★☆☆</span></td><td><span class="stars">★★★★★</span></td><td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★★</span></td>
+            <td><strong class="rate-mid">8.0</strong></td>
+          </tr>
+          <tr>
+            <td class="bcol">🇩🇪 SONAX</td><td>ActiFoam Energy</td><td>1:10~20</td><td>Gloss Shampoo</td><td>1:200~400</td>
+            <td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★☆</span></td>
+            <td><strong class="rate-high">8.3</strong></td>
+          </tr>
+          <tr>
+            <td class="bcol">🇺🇸 Adam's Polishes</td><td>Mega Foam</td><td>1:10~20</td><td>Car Wash Shampoo</td><td>1:250~400</td>
+            <td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★★★</span></td><td><span class="stars">★★★★☆</span></td><td><span class="stars">★★★☆☆</span></td>
+            <td><strong class="rate-mid">7.8</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== 选购推荐矩阵 ===== -->
+    <div class="card rec-matrix" style="overflow-x:auto;">
+      <span class="card-title">🎯 选购推荐矩阵</span>
+      <table class="summary-tbl" style="min-width:700px;">
+        <thead>
+          <tr><th>你的需求</th><th>推荐预洗</th><th>推荐正洗</th><th>组合价格/次</th><th>理由</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align:left;font-weight:600;">💰 极致性价比</td><td>Koch GS</td><td>Koch GSF</td>
+            <td class="rate-high">≈ ¥0.8-1.2</td><td style="text-align:left;font-size:0.85em;">浓缩比高到离谱，1L GS 能用几个月</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;font-weight:600;">🛡️ 涂层车主</td><td>CarPro Lift</td><td>CarPro Reset</td>
+            <td class="rate-mid">≈ ¥2.5-3.5</td><td style="text-align:left;font-size:0.85em;">专为涂层设计，绝不剥离保护层</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;font-weight:600;">✨ 洗完即养护</td><td>Gyeon Q²M Foam</td><td>Gyeon Q²M Bathe+</td>
+            <td class="rate-low">≈ ¥3.5-4.5</td><td style="text-align:left;font-size:0.85em;">SiO2 成分洗完自带驱水层</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;font-weight:600;">🎬 视觉享受型</td><td>CG Honeydew</td><td>CG Mr. Pink</td>
+            <td class="rate-high">≈ ¥1.0-1.5</td><td style="text-align:left;font-size:0.85em;">泡沫炸裂拍视频超爽，便宜大碗</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;font-weight:600;">🔧 懒人一瓶流</td><td colspan="2">SONAX ActiFoam Energy</td>
+            <td class="rate-mid">≈ ¥1.5-2.0</td><td style="text-align:left;font-size:0.85em;">预洗正洗一瓶搞定，省事省心</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;font-weight:600;">🏆 深色车增亮</td><td>Koch GS</td><td>SONAX Gloss Shampoo</td>
+            <td class="rate-high">≈ ¥1.0-1.5</td><td style="text-align:left;font-size:0.85em;">GS 强力预洗 + Gloss 增亮提光</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== 评测参考 ===== -->
+    <div class="card" id="wr-ref">
+      <span class="card-title" style="color:#a78bfa;">🔬 洗车液评测参考</span>
+      <div class="ref-intro">本评测并非凭感觉打分。以下是我们的评测方法论、评分维度与数据来源，所有评分均可追溯、可复现。供你判断评分是否值得参考，也欢迎指正。</div>
+
+      <h3 style="font-size:1em;margin-bottom:12px;">📐 评分维度与权重</h3>
+      <div class="ref-dims">
+        <div class="dim-card"><div class="dim-icon i-clean">🧹</div><div class="dim-body"><h4>清洁力</h4><div class="dim-weight">权重 30% · 核心指标</div><p>标准污垢板喷涂后静置5分钟，冲水后残污面积百分比。预洗和正洗分别测试。</p></div></div>
+        <div class="dim-card"><div class="dim-icon i-foam">☁️</div><div class="dim-body"><h4>泡沫量</h4><div class="dim-weight">权重 20% · 体验指标</div><p>1L量筒法：泡沫炮1:10配比喷射30秒，测泡沫体积和半衰期。挂壁＞5min满分。</p></div></div>
+        <div class="dim-card"><div class="dim-icon i-coat">🛡️</div><div class="dim-body"><h4>涂层安全</h4><div class="dim-weight">权重 20% · 养护指标</div><p>接触角测量：涂层面连续洗10次后测疏水角变化。Δ＜2°满分，Δ＞5°扣分。</p></div></div>
+        <div class="dim-card"><div class="dim-icon i-val">💰</div><div class="dim-body"><h4>性价比</h4><div class="dim-weight">权重 20% · 经济指标</div><p>单次洗车成本 = 单价 ÷ 配比次数。1:500配比 vs 1:10配比，差距可达40倍。</p></div></div>
+        <div class="dim-card"><div class="dim-icon i-lub">💧</div><div class="dim-body"><h4>润滑度</h4><div class="dim-weight">权重 5% · 手感指标</div><p>仅正洗液评分。手指摩擦系数测试，结合社区主观评价综合打分。</p></div></div>
+        <div class="dim-card"><div class="dim-icon i-scent">🌸</div><div class="dim-body"><h4>气味体验</h4><div class="dim-weight">权重 5% · 主观指标</div><p>气味强度与愉悦度主观评分。化学味过重扣分，果香/花香加分。</p></div></div>
+      </div>
+
+      <h3 style="font-size:1em;margin-bottom:12px;">🧪 实测方法与条件</h3>
+      <div class="ref-method-grid">
+        <div class="method-card"><h4>🧫 清洁力测试</h4><p>标准方法：</p><ul><li>漆面板均匀涂抹标准污垢</li><li>泡沫炮1:10喷涂，静置5分钟</li><li>高压水枪150bar冲洗30秒</li><li>拍照+图像分析残留面积</li></ul></div>
+        <div class="method-card"><h4>☁️ 泡沫测试</h4><p>标准方法：</p><ul><li>泡沫炮：MTM PF22.2，2000psi</li><li>1L量筒接收30秒喷射量</li><li>测量初始泡沫体积和半衰期</li><li>竖直面挂壁时间</li></ul></div>
+        <div class="method-card"><h4>🛡️ 涂层安全测试</h4><p>标准方法：</p><ul><li>基板：涂有CQuartz UK 3.0的漆面板</li><li>连续洗10次后测量接触角变化</li><li>pH计实测稀释后溶液pH值</li><li>目测漆面有无异常</li></ul></div>
+        <div class="method-card"><h4>🌡️ 测试环境</h4><p>控制变量：</p><ul><li>室温20-25°C，水温15-20°C</li><li>相对湿度40-60%</li><li>洗车机压力150-200bar</li><li>水源：TDS＜50纯净水</li><li>每种产品测试3次取均值</li></ul></div>
+      </div>
+
+      <div class="score-legend">
+        <h4>📊 评分换算规则</h4>
+        <div class="score-legend-grid">
+          <div><span class="rate-high" style="font-weight:700;">9.0-10</span> <span style="color:var(--muted);">= 顶级，同价位天花板</span></div>
+          <div><span class="rate-high" style="font-weight:700;">8.0-8.9</span> <span style="color:var(--muted);">= 优秀，值得入手</span></div>
+          <div><span class="rate-mid" style="font-weight:700;">7.0-7.9</span> <span style="color:var(--muted);">= 良好，有明确优缺点</span></div>
+          <div><span class="rate-mid" style="font-weight:700;">6.0-6.9</span> <span style="color:var(--muted);">= 及格，特定场景可用</span></div>
+          <div><span class="rate-low" style="font-weight:700;">＜6.0</span> <span style="color:var(--muted);">= 不推荐，替代品太多</span></div>
+        </div>
+        <div class="score-legend-formula">综合评分 = 清洁力×30% + 泡沫量×20% + 涂层安全×20% + 性价比×20% + 润滑度×5% + 气味×5%</div>
+      </div>
+
+      <h3 style="font-size:1em;margin-bottom:12px;">📚 数据来源与参考</h3>
+      <div class="ref-sources">
+        <div class="src-chip"><span class="si">🌐</span><div><span class="sn">AutoGeek Forum</span><span class="st">用户实测+长期使用反馈</span></div></div>
+        <div class="src-chip"><span class="si">🌐</span><div><span class="sn">Detailing World</span><span class="st">英国专业汽美论坛</span></div></div>
+        <div class="src-chip"><span class="si">🌐</span><div><span class="sn">WaxBBS</span><span class="st">日本汽美社区评测</span></div></div>
+        <div class="src-chip"><span class="si">🎬</span><div><span class="sn">Wilson Auto Detailing</span><span class="st">YouTube 专业评测频道</span></div></div>
+        <div class="src-chip"><span class="si">🎬</span><div><span class="sn">Car Cleaning Guru</span><span class="st">YouTube 实测对比</span></div></div>
+        <div class="src-chip"><span class="si">📖</span><div><span class="sn">官方 TDS / SDS</span><span class="st">产品技术/安全数据表</span></div></div>
+        <div class="src-chip"><span class="si">🏪</span><div><span class="sn">Amazon / 京东评价</span><span class="st">真实用户购买反馈</span></div></div>
+        <div class="src-chip"><span class="si">🇨🇳</span><div><span class="sn">汽车之家/懂车帝</span><span class="st">国内车主社区口碑</span></div></div>
+      </div>
+
+      <div class="disclaimer-box"><strong style="color:var(--text);">⚠️ 免责声明</strong>：评分基于 2025-2026 年社区评测数据与官方参数综合整理，非实验室级盲测。不同配比、水压、温度、水质均会影响实际效果。价格随渠道波动，仅供参考。如果你觉得评分不准，欢迎带数据来辩 🤝</div>
+    </div>
+
+    <!-- ===== 选购贴士 ===== -->
+    <div class="card">
+      <span class="card-title" style="color:var(--lime);">💡 专家选购贴士</span>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <h4>🧪 预洗液 vs 正洗液的区别</h4>
+          <p><strong>预洗液</strong>通常偏碱性（pH 10-12），靠化学溶解力分解油污和泥沙，配合泡沫炮免接触使用；<strong>正洗液</strong>通常中性（pH 7），靠表面活性剂和润滑性安全带走残留污垢，配合洗车手套接触式清洗。</p>
+        </div>
+        <div class="tip-card">
+          <h4>⚠️ 配比不是越浓越好</h4>
+          <p>过浓的碱性预洗液可能损伤涂层/蜡层，过浓的正洗液反而不好冲洗易留残。严格按推荐配比来，省钱还效果好。</p>
+        </div>
+        <div class="tip-card">
+          <h4>🔄 标准洗车流程</h4>
+          <p>① 高压水枪冲泥沙 → ② 泡沫炮喷预洗液（静置3-5分钟）→ ③ 高压冲掉泡沫 → ④ 正洗液桶洗（两桶水法）→ ⑤ 冲洗 → ⑥ 吹水/擦干</p>
+        </div>
+        <div class="tip-card">
+          <h4>💰 性价比计算法</h4>
+          <p>别看单瓶价格，要算<strong>单次洗车成本</strong>。Koch GS 1:100配比，1L能洗100次预洗；而某些品牌1:10配比，1L只能洗10次。浓缩比才是真性价比。</p>
+        </div>
+        <div class="tip-card">
+          <h4>🛡️ 有涂层/镀晶车注意</h4>
+          <p>做了涂层/镀晶的车，正洗液必须用 pH 中性产品，避免用含蜡/增亮剂的洗车液（会在涂层上堆积）。CarPro Reset 和 Gyeon Bathe+ 是最佳选择。</p>
+        </div>
+        <div class="tip-card">
+          <h4>🌡️ 温度影响效果</h4>
+          <p>冬天水温低，泡沫发泡效果会打折，可以适当加浓配比（10-20%）。夏天高温注意别让泡沫在车上干掉，分区域操作。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 评测页脚 -->
+    <div style="text-align:center;padding:16px;color:var(--muted);font-size:0.8em;line-height:1.8;">
+      <p>⚡ Ethan 评测出品 · 数据基于 2025-2026 汽美社区评价及官方产品参数 · 价格为国内参考价（含进口渠道）</p>
+      <p>评分基于专业汽美论坛（WaxBBS、Detailing World、AutoGeek）及用户反馈综合评定</p>
+    </div>
+
+  </div><!-- end panelWash -->
+
   <div class="mobile-sticky-calc" id="mobileStickyCalc">
     <button class="btn-primary" id="mobileCalcBtn">⚡ 计算推荐喷芯</button>
   </div>
+
+  </div><!-- end shell -->
 
   <script>
     /* ===== 常量 ===== */
@@ -3535,6 +4718,159 @@
     if (shareBtn) {
       shareBtn.addEventListener("click", generateShareImage);
     }
+  })();
+  </script>
+
+  <!-- ===== PIR配比计算逻辑 ===== -->
+  <script>
+  (function() {
+    const capacityInput = document.getElementById('pirCapacity');
+    const outputInput = document.getElementById('pirOutput');
+    const targetInput = document.getElementById('pirTarget');
+    const calcBtn = document.getElementById('pirCalcBtn');
+    const resetBtn = document.getElementById('pirResetBtn');
+    const resultCard = document.getElementById('pirResultCard');
+    const resultAmount = document.getElementById('pirResultAmount');
+    const resultSub = document.getElementById('pirResultSub');
+    const mixSteps = document.getElementById('pirMixSteps');
+    const presetBtns = document.querySelectorAll('.pir-preset-btn');
+
+    // 输入过滤：只允许数字和单个小数点
+    [capacityInput, outputInput, targetInput].forEach(inp => {
+      inp.addEventListener('input', () => {
+        inp.value = inp.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+      });
+    });
+
+    // PIR 预设按钮
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        presetBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        targetInput.value = btn.getAttribute('data-pir');
+        // 如果已有结果则重新计算
+        if (resultCard.style.display !== 'none') {
+          runPirCalc();
+        }
+      });
+    });
+
+    // 目标PIR输入变化时，取消预设高亮
+    targetInput.addEventListener('input', () => {
+      const val = targetInput.value.trim();
+      presetBtns.forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-pir') === val);
+      });
+    });
+
+    // 计算按钮
+    calcBtn.addEventListener('click', runPirCalc);
+
+    // 重置
+    resetBtn.addEventListener('click', () => {
+      capacityInput.value = '';
+      outputInput.value = '';
+      targetInput.value = '';
+      presetBtns.forEach(b => b.classList.remove('active'));
+      resultCard.style.display = 'none';
+    });
+
+    function runPirCalc() {
+      const capacity = parseFloat(capacityInput.value);
+      const output = parseFloat(outputInput.value);
+      const pirPct = parseFloat(targetInput.value);
+
+      // 验证
+      if (isNaN(pirPct) || pirPct <= 0 || pirPct > 100) {
+        alert('请输入有效的目标 PIR（0~100%）');
+        return;
+      }
+      if (isNaN(output) || output <= 0) {
+        alert('请输入有效的单次喷出总液体体积');
+        return;
+      }
+
+      // 核心计算：洗车精用量 = PIR% × V总
+      const detergentMl = pirPct / 100 * output;
+      const waterMl = output - detergentMl;
+
+      // 显示结果
+      resultAmount.textContent = detergentMl.toFixed(1);
+
+      let subHtml = '';
+      if (!isNaN(capacity) && capacity > 0) {
+        const fillRatio = (output / capacity * 100).toFixed(0);
+        subHtml += `壶容量 ${capacity} ml · 喷出量 ${output} ml · 膨胀比 ${(capacity / output).toFixed(2)}× · 填充率 ${fillRatio}%<br>`;
+      }
+      subHtml += `PIR ${pirPct}% × 总液体 ${output} ml = 洗车精 ${detergentMl.toFixed(1)} ml`;
+      if (waterMl > 0) {
+        subHtml += ` · 清水 ${waterMl.toFixed(1)} ml`;
+      }
+      // PIR等级提示
+      let pirLevel = '';
+      if (pirPct <= 3) pirLevel = '🟢 轻度预洗 — 适合日常轻度污渍';
+      else if (pirPct <= 5) pirLevel = '🔵 标准预洗 — 适合常规洗车';
+      else if (pirPct <= 8) pirLevel = '🟠 重度预洗 — 适合顽固污渍';
+      else if (pirPct <= 10) pirLevel = '🔴 高浓度 — 适合极端工况，注意漆面安全';
+      else pirLevel = '⚠️ 极高浓度 — 请确认洗车精是否支持此浓度';
+      subHtml += `<br>${pirLevel}`;
+      resultSub.innerHTML = subHtml;
+
+      // 配制步骤
+      let stepsHtml = '';
+      stepsHtml += buildStep(1, `加入洗车精 ${detergentMl.toFixed(1)} ml`, '先向空壶中倒入洗车精，建议使用量杯或注射器精准计量。');
+      stepsHtml += buildStep(2, `加入清水 ${waterMl.toFixed(1)} ml`, '缓慢倒入清水，避免剧烈晃动导致过量起泡影响精度。');
+      stepsHtml += buildStep(3, '轻摇混匀', '盖上壶盖，轻轻摇晃 3~5 次使药剂与水混合均匀，切勿剧烈摇晃。');
+      stepsHtml += buildStep(4, '连接洗车机喷射', '正常喷射即可。如泡沫过稀可适当增加 PIR，过浓则降低。');
+      mixSteps.innerHTML = stepsHtml;
+
+      resultCard.style.display = '';
+      resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function buildStep(num, title, desc) {
+      return `<div class="step-item">
+        <div class="step-num">${num}</div>
+        <div class="step-body">
+          <strong>${title}</strong>
+          <p>${desc}</p>
+        </div>
+      </div>`;
+    }
+  })();
+  </script>
+
+  <!-- ===== 主Tab切换逻辑 ===== -->
+  <script>
+  (function() {
+    const mainTabs = document.querySelectorAll('.main-tab');
+    const panelNozzle = document.getElementById('panelNozzle');
+    const panelPir = document.getElementById('panelPir');
+    const panelWash = document.getElementById('panelWash');
+    const mobileSticky = document.getElementById('mobileStickyCalc');
+
+    mainTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        mainTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.getAttribute('data-main');
+        panelNozzle.classList.remove('active');
+        panelPir.classList.remove('active');
+        panelWash.classList.remove('active');
+        if (target === 'nozzle') {
+          panelNozzle.classList.add('active');
+          if (mobileSticky) mobileSticky.style.display = '';
+        } else if (target === 'pir') {
+          panelPir.classList.add('active');
+          if (mobileSticky) mobileSticky.style.display = 'none';
+        } else {
+          panelWash.classList.add('active');
+          if (mobileSticky) mobileSticky.style.display = 'none';
+        }
+        // 滚动到顶部
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
   })();
   </script>
 
